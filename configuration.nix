@@ -10,6 +10,10 @@
     ./hardware-configuration.nix
     ./configuration-system.nix
     ./environment.nix
+    # Switch to plain but steady nix-level user configuration
+    # ./users.nix
+    # Switch to home-manager support as needed
+    ./users-with-home-manager.nix
     ./programs-zsh.nix
     ./programs-git.nix
   ];
@@ -19,26 +23,6 @@
     layout = "us";
     variant = "dvp";
   };
-
-  # Define a user account. Don't forget to set a password with ‘passwd’.
-  users.users.kaidong = {
-    isNormalUser = true;
-    shell = pkgs.zsh;
-    description = "Kaidong Hu";
-    extraGroups = [
-      "networkmanager"
-      "wheel"
-      "dialout"
-    ];
-    packages = with pkgs; [
-      kdePackages.kate
-      google-chrome
-      kitty
-    ];
-  };
-
-  # Install firefox.
-  programs.firefox.enable = true;
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
