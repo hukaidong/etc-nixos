@@ -27,9 +27,18 @@
 
         home-manager.nixosModules.home-manager
         {
-          # we configuring emacs overlay so should not use globalPkgs
+          # configuring emacs overlay so should not use globalPkgs
+	  # useGlobalPkgs => true
+	  # emacs overlay has no effect, emacs-git is missing from pkgs variable
           home-manager.useGlobalPkgs = false;
-          home-manager.useUserPackages = true;
+	  # zsh can not find completion functions when useUserPackages set to true
+	  # useUserPackages => true
+	  # zsh functions load in /etc/profiles/per-user/(user)/share/zsh
+	  # ${fpath} does not include this path
+	  # useUserPackages => false
+	  # zsh functions load in ~/.nix-profile/share/zsh
+	  # zsh could find those functions
+          home-manager.useUserPackages = false;
           home-manager.users.kaidong = "${home}/home.nix";
           home-manager.extraSpecialArgs = {
             inherit (inputs) plover-flake emacs-overlay;

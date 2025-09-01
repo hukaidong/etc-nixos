@@ -9,6 +9,7 @@
       nixfmt-rfc-style
       wget
       zsh
+      gcc15
     ];
 
     shellAliases = {
