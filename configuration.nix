@@ -10,10 +10,7 @@
     ./hardware-configuration.nix
     ./configuration-system.nix
     ./environment.nix
-    # Switch to plain but steady nix-level user configuration
-    # ./users.nix
-    # Switch to home-manager support as needed
-    ./users-with-home-manager.nix
+    ./users.nix
     ./programs-zsh.nix
     ./programs-git.nix
   ];
