@@ -21,7 +21,27 @@
     variant = "dvp";
   };
 
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  # Allow discover printer
+  services.avahi = {
+    enable = true;
+    nssmdns4 = true;
+    openFirewall = true;
+  };
+
+  # I need epson for my own printer :>
+  services.printing = {
+    enable = true;
+    drivers = with pkgs; [
+      cups-filters
+      cups-browsed
+      epson-escpr2
+    ];
+  };
+
+  nix.settings.experimental-features = [
+    "nix-command"
+    "flakes"
+  ];
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
