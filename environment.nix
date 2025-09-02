@@ -9,6 +9,8 @@
       gcc15
 
       # system configuring tools
+      xclip
+      comma
       git
       neovim
       nixfmt-rfc-style
