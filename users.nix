@@ -1,6 +1,10 @@
 { config, pkgs, ... }:
 
 {
+  services.udev.extraRules = ''
+    KERNEL=="uinput", GROUP="input", MODE="0660", OPTIONS+="static_node=uinput"
+  '';
+
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.kaidong = {
     isNormalUser = true;
@@ -10,6 +14,7 @@
       "networkmanager"
       "wheel"
       "dialout"
+      "input"
     ];
     packages = with pkgs; [
       kdePackages.kate
