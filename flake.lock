@@ -8,11 +8,11 @@
         "nixpkgs-stable": "nixpkgs-stable"
       },
       "locked": {
-        "lastModified": 1756743838,
-        "narHash": "sha256-se+VjQaw61JE26Q7j5yeJiGLQVoWt9mzQP4EvxS+VlU=",
+        "lastModified": 1756832996,
+        "narHash": "sha256-pW+QqeXIIKzo4GkX+WM86t7vai++RHaDE32aMDAIUJs=",
         "owner": "nix-community",
         "repo": "emacs-overlay",
-        "rev": "a8745d9ea5aa48fa451522a5b7f8c39bc15473b0",
+        "rev": "73c17b083cd9383d9dd0c98ca33c5d7cdabfec6c",
         "type": "github"
       },
       "original": {
@@ -28,11 +28,11 @@
         "plover-flake": "plover-flake"
       },
       "locked": {
-        "lastModified": 1756837576,
-        "narHash": "sha256-jwh/qnA5wwdacdUFqzgeCAG+WpLpyfjP6SnsIUtPk6Y=",
+        "lastModified": 1756866786,
+        "narHash": "sha256-KuEPtGkzJDqKj3Zu5qRjIBnlV9ub72xc8zM3Et5k47M=",
         "ref": "refs/heads/nixos",
-        "rev": "ac22a92130d9398913bddfa71900436af1f9b508",
-        "revCount": 17,
+        "rev": "661f23bd2f06bdcec06d2cb2660ca872a1a9f1c9",
+        "revCount": 19,
         "type": "git",
         "url": "file:/home/kaidong/.config/home-manager"
       },
@@ -133,11 +133,11 @@
     },
     "nixpkgs_3": {
       "locked": {
-        "lastModified": 1756617294,
-        "narHash": "sha256-aGnd4AHIYCWQKChAkHPpX+YYCt7pA6y2LFFA/s8q0wQ=",
+        "lastModified": 1756754095,
+        "narHash": "sha256-9Rsn9XEWINExosFkKEqdp8EI6Mujr1gmQiyrEcts2ls=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "b4c2c57c31e68544982226d07e4719a2d86302a8",
+        "rev": "7c815e513adbf03c9098b2bd230c1e0525c8a7f9",
         "type": "github"
       },
       "original": {

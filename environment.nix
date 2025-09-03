@@ -9,7 +9,7 @@
       gcc15
 
       # system configuring tools
-      xclip
+      wl-clipboard
       comma
       git
       neovim
