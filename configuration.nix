@@ -15,6 +15,11 @@
     ./programs-git.nix
   ];
 
+  sops = {
+    age.keyFile = "/etc/sops/age/key.txt";
+    defaultSopsFile = ./secrets/secrets.yaml;
+  };
+
   # Configure keymap in X11
   services.xserver.xkb = {
     layout = "us";

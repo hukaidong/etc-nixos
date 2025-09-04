@@ -8,14 +8,22 @@
       bash
       gcc15
 
-      # system configuring tools
+      # system configuring tools, wl-copy / wl-paste
       wl-clipboard
+      # provides xclip & xsel for wayland
+      wl-clipboard-x11
       comma
       git
       neovim
       nixfmt-rfc-style
       wget
+
+      # system requirement
+      davfs2
+      ntfs3g
       zsh
+      sops
+      age
     ];
 
     shellAliases = {
