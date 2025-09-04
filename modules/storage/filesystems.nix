@@ -18,13 +18,6 @@
     ];
   };
 
-  sops.secrets."davfs-credentials" = {
-    path = "/etc/davfs2/secrets";
-    mode = "0600";
-    owner = "root";
-  };
-
-  # dav password file stored seperately
   fileSystems."/mnt/datadav" = {
     device = "https://webdav.hukaidong.com";
     fsType = "davfs";

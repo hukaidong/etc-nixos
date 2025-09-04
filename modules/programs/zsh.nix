@@ -9,7 +9,6 @@
     };
 
     shellAliases = {
-      vim = "nvim";
       nixb = "sudo nixos-rebuild";
     };
   };

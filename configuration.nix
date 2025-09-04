@@ -6,54 +6,25 @@
 
 {
   imports = [
-    # Include the results of the hardware scan.
     ./hardware-configuration.nix
-    ./configuration-system.nix
-    ./environment.nix
     ./users.nix
-    ./programs-zsh.nix
-    ./programs-git.nix
+    ./modules/system/boot.nix
+    ./modules/system/networking.nix
+    ./modules/system/locale.nix
+    ./modules/system/audio.nix
+    ./modules/services/printing.nix
+    ./modules/services/desktop.nix
+    ./modules/programs/environment.nix
+    ./modules/programs/git.nix
+    ./modules/programs/zsh.nix
+    ./modules/storage/filesystems.nix
+    ./modules/security/sops.nix
   ];
-
-  sops = {
-    age.keyFile = "/etc/sops/age/key.txt";
-    defaultSopsFile = ./secrets/secrets.yaml;
-  };
-
-  # Configure keymap in X11
-  services.xserver.xkb = {
-    layout = "us";
-    variant = "dvp";
-  };
-
-  # Allow discover printer
-  services.avahi = {
-    enable = true;
-    nssmdns4 = true;
-    openFirewall = true;
-  };
-
-  # I need epson for my own printer :>
-  services.printing = {
-    enable = true;
-    drivers = with pkgs; [
-      cups-filters
-      cups-browsed
-      epson-escpr2
-    ];
-  };
 
   nix.settings.experimental-features = [
     "nix-command"
     "flakes"
   ];
 
-  # This value determines the NixOS release from which the default
-  # settings for stateful data, like file locations and database versions
-  # on your system were taken. It‘s perfectly fine and recommended to leave
-  # this value at the release version of the first install of this system.
-  # Before changing this value read the documentation for this option
-  # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
-  system.stateVersion = "25.05"; # Did you read the comment?
-
+  system.stateVersion = "25.05";
 }
