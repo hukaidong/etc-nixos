@@ -17,6 +17,7 @@
     ./modules/programs/environment.nix
     ./modules/programs/git.nix
     ./modules/programs/zsh.nix
+    ./modules/programs/zoom.nix
     ./modules/storage/filesystems.nix
     ./modules/security/sops.nix
   ];
