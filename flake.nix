@@ -4,6 +4,7 @@
   inputs = {
     # NixOS official package source, using the nixos-25.05 branch here
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
+    nix-ai-tools.url = "github:numtide/nix-ai-tools";
     home-manager.url = "github:nix-community/home-manager/release-25.05";
     sops-nix.url = "github:Mic92/sops-nix";
 
@@ -16,10 +17,14 @@
 
   };
 
-  outputs = inputs@{ nixpkgs, home, home-manager, sops-nix, ... }: {
+  outputs = inputs@{ nixpkgs, home, home-manager, sops-nix, ... }: 
+    let
+      system = "x86_64-linux";
+    in
+    {
     # Please replace my-nixos with your hostname
     nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
-      system = "x86_64-linux";
+      inherit system;
       specialArgs = { inherit inputs; };
       modules = [
         sops-nix.nixosModules.sops
@@ -42,9 +47,14 @@
 	  # zsh could find those functions
           home-manager.useUserPackages = false;
           home-manager.users.kaidong = "${home}/home.nix";
-          home-manager.extraSpecialArgs = {
-            inherit (inputs) plover-flake emacs-overlay;
-          };
+          home-manager.extraSpecialArgs = 
+              let
+              nix-ai-tools-pkgs = inputs.nix-ai-tools.packages.${system};
+              in
+              {
+                inherit nix-ai-tools-pkgs;
+                inherit (inputs) plover-flake emacs-overlay;
+              };
         }
       ];
     };
