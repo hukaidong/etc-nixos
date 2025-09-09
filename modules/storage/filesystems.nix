@@ -25,6 +25,11 @@
       "auto"
       "nofail"
       "user"
+      "permissions"
+      "uid=1000"
+      "gid=100"
+      "dmask=0027"
+      "fmask=0137"
     ];
   };
 }

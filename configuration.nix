@@ -12,6 +12,7 @@
     ./modules/system/networking.nix
     ./modules/system/locale.nix
     ./modules/system/audio.nix
+    ./modules/system/fonts.nix
     ./modules/services/printing.nix
     ./modules/services/desktop.nix
     ./modules/programs/environment.nix
@@ -26,6 +27,8 @@
     "nix-command"
     "flakes"
   ];
+
+
 
   system.stateVersion = "25.05";
 }
