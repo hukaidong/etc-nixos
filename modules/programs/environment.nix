@@ -2,20 +2,20 @@
 {
   environment = {
     systemPackages = with pkgs; [
+      age
       bash
-      gcc15
-      wl-clipboard
-      wl-clipboard-x11
       comma
+      davfs2
+      gcc15
       git
       neovim
       nixfmt-rfc-style
-      wget
-      davfs2
       ntfs3g
-      zsh
       sops
-      age
+      wget
+      xclip
+      xsel
+      zsh
     ];
 
     shellAliases = {
