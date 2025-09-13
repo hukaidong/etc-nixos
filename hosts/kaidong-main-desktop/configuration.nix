@@ -10,6 +10,7 @@
     ./hardware-configuration.nix
     ./users.nix
     ./backup.nix
+    ./davmail.nix
   ];
 
   networking.hostName = "Kaidong-Main-Desktop";
