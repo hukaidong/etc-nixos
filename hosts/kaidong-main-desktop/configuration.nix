@@ -13,5 +13,9 @@
 
   networking.hostName = "Kaidong-Main-Desktop";
 
+  home-manager.extraSpecialArgs = {
+    homePath = "/home";
+  };
+
   system.stateVersion = "25.05";
 }
