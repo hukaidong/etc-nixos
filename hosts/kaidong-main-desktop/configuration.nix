@@ -9,6 +9,7 @@
   imports = [
     ./hardware-configuration.nix
     ./users.nix
+    ./backup.nix
   ];
 
   networking.hostName = "Kaidong-Main-Desktop";
