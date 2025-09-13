@@ -28,6 +28,4 @@
       VISUAL = "nvim";
     };
   };
-
-  nixpkgs.config.allowUnfree = true;
 }
