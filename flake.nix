@@ -4,6 +4,7 @@
   inputs = {
     # NixOS official package source, using the nixos-25.05 branch here
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
+    nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
     nix-ai-tools.url = "github:numtide/nix-ai-tools";
     home-manager.url = "github:nix-community/home-manager/release-25.05";
     sops-nix.url = "github:Mic92/sops-nix";
@@ -17,22 +18,29 @@
 
   };
 
-  outputs = inputs@{ nixpkgs, home, home-manager, sops-nix, ... }: 
+  outputs =
+    inputs@{
+      nixpkgs,
+      home,
+      home-manager,
+      sops-nix,
+      ...
+    }:
     let
       system = "x86_64-linux";
     in
     {
-    # Please replace my-nixos with your hostname
-    nixosConfigurations.Kaidong-Main-Desktop = nixpkgs.lib.nixosSystem {
-      specialArgs = { inherit inputs; };
-      modules = [
-        sops-nix.nixosModules.sops
-        home-manager.nixosModules.home-manager
+      # Please replace my-nixos with your hostname
+      nixosConfigurations.Kaidong-Main-Desktop = nixpkgs.lib.nixosSystem {
+        specialArgs = { inherit inputs; };
+        modules = [
+          sops-nix.nixosModules.sops
+          home-manager.nixosModules.home-manager
 
-        ./hosts/kaidong-main-desktop/configuration.nix
-        ./modules/all.nix
-        ./home-manager.nix
-      ];
+          ./hosts/kaidong-main-desktop/configuration.nix
+          ./modules/all.nix
+          ./home-manager.nix
+        ];
+      };
     };
-  };
 }

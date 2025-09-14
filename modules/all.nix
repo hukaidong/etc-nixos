@@ -1,20 +1,18 @@
-{ config, pkgs, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
+
+let
+  # Get all .nix files recursively, excluding all.nix itself
+  nixFiles = lib.filesystem.listFilesRecursive ./.;
+  moduleFiles = builtins.filter (
+    path: lib.hasSuffix ".nix" (toString path) && (toString path) != (toString ./all.nix)
+  ) nixFiles;
+in
 
 {
-  imports = [
-    ./programs/environment.nix
-    ./programs/git.nix
-    ./programs/zoom.nix
-    ./programs/zsh.nix
-    ./security/sops.nix
-    ./services/desktop.nix
-    ./services/printing.nix
-    ./storage/filesystems.nix
-    ./system/audio.nix
-    ./system/boot.nix
-    ./system/fonts.nix
-    ./system/locale.nix
-    ./system/misc.nix
-    ./system/networking.nix
-  ];
+  imports = moduleFiles;
 }

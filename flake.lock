@@ -50,11 +50,11 @@
         "plover-flake": "plover-flake"
       },
       "locked": {
-        "lastModified": 1757724811,
-        "narHash": "sha256-aKT4UxmooGiIobxUOk4OlKZWOtlrVIOiFsXA6Us7Y/w=",
+        "lastModified": 1757866738,
+        "narHash": "sha256-Y5Sc05tnsPHkTWVWmXL0CPOPK5ZoobfoCcoDOIgw2Gg=",
         "ref": "refs/heads/nixos",
-        "rev": "97edffaafc3a5af3aa1b7399f89e476aa4e20a89",
-        "revCount": 10,
+        "rev": "d42bdae3a478b07c1a2c7142dc7c02d4382aea2b",
+        "revCount": 13,
         "type": "git",
         "url": "file:/home/kaidong/.config/home-manager"
       },
@@ -153,6 +153,22 @@
       "original": {
         "owner": "NixOS",
         "ref": "nixos-24.11",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "nixpkgs-unstable": {
+      "locked": {
+        "lastModified": 1757745802,
+        "narHash": "sha256-hLEO2TPj55KcUFUU1vgtHE9UEIOjRcH/4QbmfHNF820=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "c23193b943c6c689d70ee98ce3128239ed9e32d1",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "nixos-unstable",
         "repo": "nixpkgs",
         "type": "github"
       }
@@ -488,6 +504,7 @@
         "home-manager": "home-manager_2",
         "nix-ai-tools": "nix-ai-tools",
         "nixpkgs": "nixpkgs_4",
+        "nixpkgs-unstable": "nixpkgs-unstable",
         "plover-flake": "plover-flake_2",
         "sops-nix": "sops-nix"
       }

@@ -14,12 +14,22 @@
   # zsh could find those functions
   home-manager.useUserPackages = false;
   home-manager.users.kaidong = "${inputs.home}/home.nix";
+  home-manager.sharedModules = [
+    inputs.plover-flake.homeManagerModules.plover
+  ];
   home-manager.extraSpecialArgs =
     let
       nix-ai-tools-pkgs = inputs.nix-ai-tools.packages.${pkgs.system};
+      pkgs-unstable = import inputs.nixpkgs-unstable {
+        inherit (pkgs) system;
+        config = {
+          allowUnfree = true;
+        };
+      };
     in
     {
       inherit nix-ai-tools-pkgs;
+      inherit pkgs-unstable;
       inherit (inputs) plover-flake emacs-overlay;
     };
 }

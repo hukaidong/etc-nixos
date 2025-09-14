@@ -8,7 +8,7 @@
       davfs2
       gcc15
       git
-      neovim
+      neovim-unwrapped
       nixfmt-rfc-style
       ntfs3g
       sops
@@ -18,14 +18,13 @@
       zsh
     ];
 
-    shellAliases = {
-      vim = "nvim";
-    };
-
     sessionVariables = {
       LC_COLLATE = "C";
       EDITOR = "nvim";
       VISUAL = "nvim";
     };
   };
+
+  programs.neovim.vimAlias = true;
+  programs.nix-ld.enable = true;
 }
