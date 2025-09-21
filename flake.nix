@@ -15,7 +15,6 @@
 
     emacs-overlay.inputs.nixpkgs.follows = "nixpkgs";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
-
   };
 
   outputs =
