@@ -25,9 +25,6 @@
       sops-nix,
       ...
     }:
-    let
-      system = "x86_64-linux";
-    in
     {
       # Please replace my-nixos with your hostname
       nixosConfigurations.Kaidong-Main-Desktop = nixpkgs.lib.nixosSystem {
@@ -37,6 +34,17 @@
           home-manager.nixosModules.home-manager
 
           ./hosts/kaidong-main-desktop/configuration.nix
+          ./modules/all.nix
+        ];
+      };
+
+      nixosConfigurations.Kaidong-MBP14 = nixpkgs.lib.nixosSystem {
+        specialArgs = { inherit inputs; };
+        modules = [
+          sops-nix.nixosModules.sops
+          home-manager.nixosModules.home-manager
+
+          ./hosts/kaidong-mbp14/configuration.nix
           ./modules/all.nix
         ];
       };

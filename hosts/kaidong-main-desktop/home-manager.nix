@@ -31,5 +31,6 @@
       inherit nix-ai-tools-pkgs;
       inherit pkgs-unstable;
       inherit (inputs) plover-flake emacs-overlay;
+      homePath = "/home";
     };
 }

@@ -28,10 +28,6 @@ in
 
   networking.hostName = "Kaidong-Main-Desktop";
 
-  home-manager.extraSpecialArgs = {
-    homePath = "/home";
-  };
-
   boot.kernelPackages = pkgs.linuxPackages_latest;
   system.stateVersion = "25.05";
 }
