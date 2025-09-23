@@ -20,10 +20,11 @@ in
 
   imports = [
     ./hardware-configuration.nix
-    ./users.nix
     ./backup.nix
     ./davmail.nix
+    ./filesystem.nix
     ./home-manager.nix
+    ./users.nix
   ];
 
   networking.hostName = "Kaidong-Main-Desktop";

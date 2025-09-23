@@ -4,7 +4,6 @@
     systemPackages = with pkgs; [
       age
       bash
-      comma
       davfs2
       gcc15
       git
@@ -27,4 +26,5 @@
 
   programs.neovim.vimAlias = true;
   programs.nix-ld.enable = true;
+  programs.nix-index-database.comma.enable = true;
 }
