@@ -38,7 +38,6 @@
 
           ./hosts/kaidong-main-desktop/configuration.nix
           ./modules/all.nix
-          ./home-manager.nix
         ];
       };
     };

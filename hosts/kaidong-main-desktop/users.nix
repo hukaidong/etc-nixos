@@ -11,6 +11,7 @@
     shell = pkgs.zsh;
     description = "Kaidong Hu";
     extraGroups = [
+      "docker"
       "networkmanager"
       "wheel"
       "dialout"

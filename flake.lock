@@ -50,11 +50,11 @@
         "plover-flake": "plover-flake"
       },
       "locked": {
-        "lastModified": 1758127494,
-        "narHash": "sha256-LrFx/xgiHLkZ6PONY7DSnxjP9uohZb6jl8Z+TnyALlQ=",
+        "lastModified": 1758569236,
+        "narHash": "sha256-K+wkIhVL/I8DXjSwDR2+p/K4tbE8Uo/C8MMVAUvIDIw=",
         "ref": "refs/heads/nixos",
-        "rev": "f97d7f5d0f6d948bcd0e8387a5ad879fcec14f08",
-        "revCount": 16,
+        "rev": "174ceb0a3bcaab7d841115d80bf31f883e98dc2e",
+        "revCount": 18,
         "type": "git",
         "url": "file:/home/kaidong/.config/home-manager"
       },
