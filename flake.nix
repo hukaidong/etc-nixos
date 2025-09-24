@@ -48,6 +48,7 @@
           home-manager.nixosModules.home-manager
           nix-index-database.nixosModules.nix-index
 
+          ./home/home.nix
           ./hosts/kaidong-mbp14/configuration.nix
           ./modules/all.nix
         ];
