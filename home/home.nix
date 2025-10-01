@@ -1,4 +1,9 @@
-{ inputs, pkgs, ... }:
+{
+  inputs,
+  pkgs,
+  lib,
+  ...
+}:
 {
   home-manager.useGlobalPkgs = true;
   home-manager.useUserPackages = true;
