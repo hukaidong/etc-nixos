@@ -2,64 +2,42 @@
 #
 # Please see https://i3wm.org/docs/userguide.html for a complete reference!
 
+# General Settings {{{1
+# Basic Settings {{{2
 set $mod Mod4
 
-# Font for window titles. Will also be used by the bar unless a different font
-# is used in the bar {} block below.
-font pango:monospace 8
+font pango:Noto Serif, Demi Bold 8
+# }}}2
 
-# This font is widely installed, provides lots of unicode glyphs, right-to-left
-# text rendering and scalability on retina/hidpi displays (thanks to pango).
-#font pango:DejaVu Sans Mono 8
-
-# Start XDG autostart .desktop files using dex. See also
-# https://wiki.archlinux.org/index.php/XDG_Autostart
+# Startup Applications {{{2
 exec --no-startup-id dex --autostart --environment i3
-
-# The combination of xss-lock, nm-applet and pactl is a popular choice, so
-# they are included here as an example. Modify as you see fit.
-
-# xss-lock grabs a logind suspend inhibit lock and will use i3lock to lock the
-# screen before suspend. Use loginctl lock-session to lock your screen.
 exec --no-startup-id xss-lock --transfer-sleep-lock -- i3lock --nofork
-
-# Set wallpaper with feh
 exec --no-startup-id feh --recursive --bg-fill --randomize /etc/nixos/configs/wallpapers/
+# }}}2
 
-# Network and audio will be managed by plasma
-# NetworkManager is the most popular way to manage wireless networks on Linux,
-# and nm-applet is a desktop environment-independent system tray GUI for it.
-# exec --no-startup-id nm-applet
-# Use pactl to adjust volume in PulseAudio.
-# set $refresh_i3status killall -SIGUSR1 i3status
-# bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ +10% && $refresh_i3status
-# bindsym XF86AudioLowerVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ -10% && $refresh_i3status
-# bindsym XF86AudioMute exec --no-startup-id pactl set-sink-mute @DEFAULT_SINK@ toggle && $refresh_i3status
-# bindsym XF86AudioMicMute exec --no-startup-id pactl set-source-mute @DEFAULT_SOURCE@ toggle && $refresh_i3status
-
-# Use Mouse+$mod to drag floating windows to their wanted position
+# Mouse and Drag Settings {{{2
 floating_modifier $mod
-
-# move tiling windows via drag & drop by left-clicking into the title bar,
-# or left-clicking anywhere into the window while holding the floating modifier.
 tiling_drag modifier titlebar
+# }}}2
+# }}}1
 
-# kill window by mouse middle-click on title bar
+# Keybindings {{{1
+# Application Launcher {{{2
+# bindsym $mod+e exec --no-startup-id i3-dmenu-desktop
+bindcode $mod+40 exec --no-startup-id i3-dmenu-desktop
+# }}}2
+
+# Window Management - Basic {{{2
 bindsym --border button2 kill
-# kill focused window
 # bindsym $mod+Shift+W kill
 bindcode $mod+Shift+59 kill
+# bindsym $mod+Return exec kitty
+bindcode $mod+36 exec kitty
+# bindsym $mod+Shift+Return fullscreen toggle
+bindcode $mod+Shift+36 fullscreen toggle
+# }}}2
 
-
-# start dmenu (a program launcher)
-# bindsym $mod+e exec --no-startup-id dmenu_run
-# A more modern dmenu replacement is rofi:
-# bindcode $mod+40 exec "rofi -modi drun,run -show drun"
-# There also is i3-dmenu-desktop which only displays applications shipping a
-# .desktop file. It is a wrapper around dmenu, so you need that installed.
-bindcode $mod+40 exec --no-startup-id i3-dmenu-desktop
-
-# change focus
+# Window Management - Focus {{{2
 # bindsym $mod+h focus left
 bindcode $mod+43 focus left
 # bindsym $mod+j focus down
@@ -68,8 +46,9 @@ bindcode $mod+54 focus down
 bindcode $mod+55 focus up
 # bindsym $mod+l focus right
 bindcode $mod+33 focus right
+# }}}2
 
-# move focused window
+# Window Management - Move {{{2
 # bindsym $mod+Shift+H move left
 bindcode $mod+Shift+43 move left
 # bindsym $mod+Shift+J move down
@@ -78,47 +57,34 @@ bindcode $mod+Shift+54 move down
 bindcode $mod+Shift+55 move up
 # bindsym $mod+Shift+L move right
 bindcode $mod+Shift+33 move right
+# }}}2
 
-# alternatively, you can use the cursor keys:
-# bindsym $mod+Shift+Left move left
-# bindsym $mod+Shift+Down move down
-# bindsym $mod+Shift+Up move up
-# bindsym $mod+Shift+Right move right
-
-# enter fullscreen mode for the focused container
-# start a terminal
-# FIXME: set $TERMINAL environment variable instead of hard link
-# bindsym $mod+Return exec kitty
-bindcode $mod+36 exec kitty
-# bindsym $mod+Shift+Return fullscreen toggle
-bindcode $mod+Shift+36 fullscreen toggle
-
-# change container layout (stacked, tabbed, toggle split)
-
-#bindsym $mod+s layout stacking
+# Layout Management {{{2
+# bindsym $mod+s layout stacking
 bindcode $mod+47 layout stacking
-#bindsym $mod+comma layout tabbed [Dvorak 25]
+# bindsym $mod+comma layout tabbed
 bindcode $mod+25 layout tabbed
-#bindsym $mod+period layout toggle split [Dvorak 26]
+# bindsym $mod+period layout toggle split
 bindcode $mod+26 layout toggle split
-#bindsym $mod+v split vertical
+# bindsym $mod+v split vertical
 bindcode $mod+60 split vertical
+# }}}2
 
-
-# toggle tiling / floating
-# change focus between tiling / floating windows
+# Floating and Focus Mode {{{2
 # bindsym $mod+Shift+space floating toggle
 bindcode $mod+Shift+65 floating toggle
 # bindsym $mod+space focus mode_toggle
 bindcode $mod+65 focus mode_toggle
+# }}}2
 
-# scratchpad
+# Scratchpad {{{2
 # bindsym $mod+minus scratchpad show
 bindcode $mod+48 scratchpad show
 # bindsym $mod+Shift+underscore move scratchpad
 bindcode $mod+Shift+48 move scratchpad
+# }}}2
 
-# cursor-style focusing for nested containers
+# Container Navigation {{{2
 # bindsym $mod+Down focus child
 bindcode $mod+116 focus child
 # bindsym $mod+Up focus parent
@@ -127,9 +93,52 @@ bindcode $mod+111 focus parent
 bindcode $mod+113 workspace prev
 # bindsym $mod+Right workspace next
 bindcode $mod+114 workspace next
+# }}}2
 
-# Define names for default workspaces for which we configure key bindings later on.
-# We use variables to avoid repeating the names in multiple places.
+# Marks {{{2
+# bindsym $mod+m exec i3-input -F 'mark %s' -l 1 -P 'Mark: '
+bindcode $mod+58 exec i3-input -F 'mark %s' -l 1 -P 'Mark: '
+# bindsym $mod+g exec i3-input -F '[con_mark="%s"] focus' -l 1 -P 'Goto: '
+bindcode $mod+42 exec i3-input -F '[con_mark="%s"] focus' -l 1 -P 'Goto: '
+# bindsym $mod+p exec i3-input -F 'move window to mark %s' -l 1 -P 'Move to: '
+bindcode $mod+27 exec i3-input -F 'move window to mark %s' -l 1 -P 'Move to: '
+# }}}2
+
+# Resize Mode {{{2
+mode "resize" {
+        # bindsym h resize shrink width 10 px or 10 ppt
+        bindcode 43 resize shrink width 10 px or 10 ppt
+        # bindsym j resize grow height 10 px or 10 ppt
+        bindcode 54 resize grow height 10 px or 10 ppt
+        # bindsym k resize shrink height 10 px or 10 ppt
+        bindcode 55 resize shrink height 10 px or 10 ppt
+        # bindsym l resize grow width 10 px or 10 ppt
+        bindcode 33 resize grow width 10 px or 10 ppt
+
+        # bindsym Left resize shrink width 10 px or 10 ppt
+        bindcode 113 resize shrink width 10 px or 10 ppt
+        # bindsym Down resize grow height 10 px or 10 ppt
+        bindcode 116 resize grow height 10 px or 10 ppt
+        # bindsym Up resize shrink height 10 px or 10 ppt
+        bindcode 111 resize shrink height 10 px or 10 ppt
+        # bindsym Right resize grow width 10 px or 10 ppt
+        bindcode 114 resize grow width 10 px or 10 ppt
+
+        # bindsym Return mode "default"
+        bindcode 36 mode "default"
+        # bindsym Escape mode "default"
+        bindcode 9 mode "default"
+        # bindsym $mod+r mode "default"
+        bindcode $mod+32 mode "default"
+}
+
+# bindsym $mod+r mode "resize"
+bindcode $mod+32 mode "resize"
+# }}}2
+# }}}1
+
+# Workspaces {{{1
+# Workspace Definitions {{{2
 set $ws1 "1-MAIN"
 set $ws2 "2-ALTRN"
 set $ws3 "3"
@@ -140,9 +149,9 @@ set $ws7 "7"
 set $ws8 "8-GCHROM"
 set $ws9 "9-COMM"
 set $ws10 "10"
+# }}}2
 
-# switch to workspace - using bindcode for layout independence
-# keysym >> & [ { } ( = * ) + ] <<
+# Workspace Switching {{{2
 bindcode $mod+10 workspace number $ws1
 bindcode $mod+11 workspace number $ws2
 bindcode $mod+12 workspace number $ws3
@@ -153,9 +162,9 @@ bindcode $mod+16 workspace number $ws7
 bindcode $mod+17 workspace number $ws8
 bindcode $mod+18 workspace number $ws9
 bindcode $mod+19 workspace number $ws10
+# }}}2
 
-# move focused container to workspace - using bindcode for layout independence
-# keysym >> & 7 5 3 1 9 0 2 4 6 << (with Shift)
+# Move Container to Workspace {{{2
 bindcode $mod+Shift+10 move container to workspace number $ws1
 bindcode $mod+Shift+11 move container to workspace number $ws2
 bindcode $mod+Shift+12 move container to workspace number $ws3
@@ -166,60 +175,39 @@ bindcode $mod+Shift+16 move container to workspace number $ws7
 bindcode $mod+Shift+17 move container to workspace number $ws8
 bindcode $mod+Shift+18 move container to workspace number $ws9
 bindcode $mod+Shift+19 move container to workspace number $ws10
+# }}}2
 
-# resize window (you can also use the mouse for that)
-mode "resize" {
-        # These bindings trigger as soon as you enter the resize mode
+# Workspace Assignments {{{2
+assign [class="discord"] → $ws9
+# }}}2
 
-        # Pressing left will shrink the window’s width.
-        # Pressing right will grow the window’s width.
-        # Pressing up will shrink the window’s height.
-        # Pressing down will grow the window’s height.
-        # bindsym h resize shrink width 10 px or 10 ppt
-        bindcode 43 resize shrink width 10 px or 10 ppt
-        # bindsym j resize grow height 10 px or 10 ppt
-        bindcode 54 resize grow height 10 px or 10 ppt
-        # bindsym k resize shrink height 10 px or 10 ppt
-        bindcode 55 resize shrink height 10 px or 10 ppt
-        # bindsym l resize grow width 10 px or 10 ppt
-        bindcode 33 resize grow width 10 px or 10 ppt
+# Initial Workspace {{{2
+exec i3-msg workspace $ws1
+# }}}2
+# }}}1
 
-        # same bindings, but for the arrow keys
-        # bindsym Left resize shrink width 10 px or 10 ppt
-        bindcode 113 resize shrink width 10 px or 10 ppt
-        # bindsym Down resize grow height 10 px or 10 ppt
-        bindcode 116 resize grow height 10 px or 10 ppt
-        # bindsym Up resize shrink height 10 px or 10 ppt
-        bindcode 111 resize shrink height 10 px or 10 ppt
-        # bindsym Right resize grow width 10 px or 10 ppt
-        bindcode 114 resize grow width 10 px or 10 ppt
-
-        # back to normal: Enter or Escape or $mod+r
-        # bindsym Return mode "default"
-        bindcode 36 mode "default"
-        # bindsym Escape mode "default"
-        bindcode 9 mode "default"
-        # bindsym $mod+p mode "default"
-        bindcode $mod+27 mode "default"
-}
-
-# bindsym $mod+p mode "resize"
-bindcode $mod+27 mode "resize"
-
-# Start i3bar to display a workspace bar (plus the system information i3status
-# finds out, if available)
+# Appearance and UI {{{1
+# Status Bar {{{2
 bar {
-        font pango:DejaVu Sans Mono 10
+        font pango:Noto Serif 10
         separator_symbol ":|:"
         status_command i3status
 }
+# }}}2
 
+# Gaps and Appearance {{{2
 gaps inner 8px
 gaps bottom 0px
-#smart_gaps on
 
 focus_follows_mouse no
 
+default_border normal
+default_floating_border normal
+# }}}2
+# }}}1
+
+# Window Rules {{{1
+# KDE Plasma {{{2
 for_window [all] title_window_icon on
 for_window [title="Desktop — Plasma"] kill, floating enable, border none
 for_window [title="Desktop @ QRect"] kill, floating enable, border none
@@ -231,16 +219,14 @@ for_window [class="krunner"] floating enable, border none
 for_window [class="Kmix"] floating enable, border none
 for_window [class="Klipper"] floating enable, border none
 for_window [class="Plasmoidviewer"] floating enable, border none
-for_window [class="(?i).*nextcloud.*"] floating disable
 for_window [class="plasmashell" window_type="notification"] floating enable, border none, move right 700px, move down 450px
-for_window [title="Plover: Suggestions"] floating enable, border pixel 5, move scratchpad, move right 50px, move up 200px
-
-assign [class="discord"] → $ws9
 no_focus [class="plasmashell" window_type="notification"]
+# }}}2
 
-default_border normal
-default_floating_border normal
+# Applications {{{2
+for_window [class="(?i).*nextcloud.*"] floating disable
+for_window [title="Plover: Suggestions"] floating enable, border pixel 5, move scratchpad, move right 50px, move up 200px
+# }}}2
+# }}}1
 
-exec i3-msg workspace $ws1
-
-# vim: ft=i3config nowrap
+# vim: ft=i3config nowrap foldmethod=marker foldlevel=0
