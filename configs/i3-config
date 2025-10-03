@@ -39,7 +39,7 @@ bindcode $mod+Shift+36 fullscreen toggle
 
 # Window Management - Focus {{{2
 # bindsym $mod+h focus left
-bindcode $mod+43 focus left
+bindcode $mod+44 focus left
 # bindsym $mod+j focus down
 bindcode $mod+54 focus down
 # bindsym $mod+k focus up
@@ -50,7 +50,7 @@ bindcode $mod+33 focus right
 
 # Window Management - Move {{{2
 # bindsym $mod+Shift+H move left
-bindcode $mod+Shift+43 move left
+bindcode $mod+Shift+44 move left
 # bindsym $mod+Shift+J move down
 bindcode $mod+Shift+54 move down
 # bindsym $mod+Shift+K move up
@@ -107,7 +107,7 @@ bindcode $mod+27 exec i3-input -F 'move window to mark %s' -l 1 -P 'Move to: '
 # Resize Mode {{{2
 mode "resize" {
         # bindsym h resize shrink width 10 px or 10 ppt
-        bindcode 43 resize shrink width 10 px or 10 ppt
+        bindcode 44 resize shrink width 10 px or 10 ppt
         # bindsym j resize grow height 10 px or 10 ppt
         bindcode 54 resize grow height 10 px or 10 ppt
         # bindsym k resize shrink height 10 px or 10 ppt
