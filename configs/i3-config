@@ -71,6 +71,7 @@ bindcode $mod+60 split vertical
 # }}}2
 
 # Floating and Focus Mode {{{2
+bindsym --border button3 floating toggle
 # bindsym $mod+Shift+space floating toggle
 bindcode $mod+Shift+65 floating toggle
 # bindsym $mod+space focus mode_toggle
