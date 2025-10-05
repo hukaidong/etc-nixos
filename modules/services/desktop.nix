@@ -31,8 +31,11 @@
   services.displayManager.sddm.enable = true;
   services.displayManager.defaultSession = "plasma-i3wm+i3";
 
-  systemd.user.services.plasma-kwin_x11.enable = false;
   # Use x11 as default plasma session until plover find a solution
   # running keyboard emulator in wayland
   #services.displayManager.sddm.settings.General.DisplayServer = "x11-user";
+
+  # Create a systemd user service for fakwin
+  systemd.user.services.plasma-kwin_x11.enable = false;
+  services.fakwin.enable = true;
 }

@@ -6,6 +6,7 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
     nix-ai-tools.url = "github:numtide/nix-ai-tools";
+    fakwin.url = "github:DMaroo/fakwin";
     home-manager.url = "github:nix-community/home-manager/release-25.05";
     sops-nix.url = "github:Mic92/sops-nix";
     nix-index-database.url = "github:nix-community/nix-index-database";
@@ -17,25 +18,29 @@
     nix-index-database.inputs.nixpkgs.follows = "nixpkgs";
     emacs-overlay.inputs.nixpkgs.follows = "nixpkgs";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
+    fakwin.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs =
     inputs@{
       nixpkgs,
       home,
-      home-manager,
-      sops-nix,
       nix-index-database,
+      fakwin,
       ...
     }:
+    let
+      commonNixModules = with inputs; [
+        fakwin.nixosModules.default
+        home-manager.nixosModules.home-manager
+        sops-nix.nixosModules.sops
+      ];
+    in
     {
       # Please replace my-nixos with your hostname
       nixosConfigurations.Kaidong-Main-Desktop = nixpkgs.lib.nixosSystem {
         specialArgs = { inherit inputs; };
-        modules = [
-          sops-nix.nixosModules.sops
-          home-manager.nixosModules.home-manager
-
+        modules = commonNixModules ++ [
           ./hosts/kaidong-main-desktop/configuration.nix
           ./modules/all.nix
         ];
@@ -43,9 +48,7 @@
 
       nixosConfigurations.Kaidong-MBP14 = nixpkgs.lib.nixosSystem {
         specialArgs = { inherit inputs; };
-        modules = [
-          sops-nix.nixosModules.sops
-          home-manager.nixosModules.home-manager
+        modules = commonNixModules ++ [
           nix-index-database.nixosModules.nix-index
 
           ./home/home.nix
