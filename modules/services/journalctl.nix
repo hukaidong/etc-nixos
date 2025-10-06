@@ -1,0 +1,13 @@
+{
+  # Aggressive journald configuration to limit disk usage
+  service.journald.extraConfig = ''
+    # Retain journal entries for a maximum of 4 weeks
+    MaxRetentionSec=1w
+
+    # Limit the total size of all journal files to 10GB
+    SystemMaxUse=1G
+
+    # Compress old journal files to save space
+    Compress=yes
+  '';
+}
