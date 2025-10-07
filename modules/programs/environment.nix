@@ -25,6 +25,7 @@
     };
   };
 
+  programs.direnv.enable = true;
   programs.neovim.vimAlias = true;
   programs.nix-ld.enable = true;
 }

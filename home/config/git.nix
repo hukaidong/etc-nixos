@@ -37,6 +37,7 @@
       ".localfiles"
       ".lvimrc"
       ".envrc"
+      ".direnv"
       "result"
 
       # Git merges
