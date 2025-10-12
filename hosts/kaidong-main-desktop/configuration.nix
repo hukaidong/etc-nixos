@@ -23,7 +23,6 @@ in
     ./backup.nix
     ./davmail.nix
     ./filesystem.nix
-    ./home-manager.nix
     ./users.nix
   ];
 

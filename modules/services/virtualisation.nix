@@ -1,6 +1,8 @@
 { pkgs, ... }:
 {
   environment.systemPackages = with pkgs; [
+    docker
+    devcontainer
     kubernetes
     podman-compose
   ];
