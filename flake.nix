@@ -30,7 +30,19 @@
       ...
     }:
     let
+      unstableOverlay = { ... }: {
+        nixpkgs.overlays = [
+          (final: prev: {
+            unstable = import inputs.nixpkgs-unstable {
+              system = final.system;
+              config.allowUnfree = true;
+            };
+          })
+        ];
+      };
+
       commonNixModules = with inputs; [
+        unstableOverlay
         fakwin.nixosModules.default
         home-manager.nixosModules.home-manager
         sops-nix.nixosModules.sops
@@ -39,7 +51,9 @@
     {
       # Please replace my-nixos with your hostname
       nixosConfigurations.Kaidong-Main-Desktop = nixpkgs.lib.nixosSystem {
-        specialArgs = { inherit inputs; };
+        specialArgs = {
+          inherit inputs;
+        };
         modules = commonNixModules ++ [
           ./hosts/kaidong-main-desktop/configuration.nix
           ./modules/all.nix
@@ -47,7 +61,9 @@
       };
 
       nixosConfigurations.Kaidong-MBP14 = nixpkgs.lib.nixosSystem {
-        specialArgs = { inherit inputs; };
+        specialArgs = {
+          inherit inputs;
+        };
         modules = commonNixModules ++ [
           nix-index-database.nixosModules.nix-index
 

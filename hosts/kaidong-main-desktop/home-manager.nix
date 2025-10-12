@@ -17,6 +17,7 @@
   home-manager.sharedModules = [
     inputs.plover-flake.homeManagerModules.plover
   ];
+  home-manager.backupFileExtension = "hm-backup";
   home-manager.extraSpecialArgs =
     let
       nix-ai-tools-pkgs = inputs.nix-ai-tools.packages.${pkgs.system};
