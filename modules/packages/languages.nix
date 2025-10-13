@@ -2,14 +2,11 @@
 
 {
   environment.systemPackages = with pkgs; [
-    # Python development
-    (python313.withPackages (p: with p; [
-      pip
-      numpy
-      ipython
-      jupyter
-    ]))
+    # keep here minimum with only language use for quick
+    # scripts and development environment setup
+    ruby_3_4
 
-    nodejs_latest
+    # Github copilot requires nodejs
+    nodejs_24
   ];
 }

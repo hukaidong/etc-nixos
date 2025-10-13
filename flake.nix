@@ -34,6 +34,7 @@
                 system = final.system;
                 config.allowUnfree = true;
               };
+              ai-tools = inputs.nix-ai-tools.packages.${final.system};
             })
           ];
         };

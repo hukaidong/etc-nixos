@@ -16,7 +16,6 @@
 
   home-manager.extraSpecialArgs =
     let
-      nix-ai-tools-pkgs = inputs.nix-ai-tools.packages.${pkgs.system};
       pkgs-unstable = import inputs.nixpkgs-unstable {
         inherit (pkgs) system;
         config = {
@@ -25,9 +24,8 @@
       };
     in
     {
-      inherit nix-ai-tools-pkgs;
       inherit pkgs-unstable;
-      inherit (inputs) plover-flake emacs-overlay;
+      inherit (inputs) plover-flake;
       homePath = "/home";
     };
 
