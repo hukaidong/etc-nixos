@@ -7,7 +7,6 @@
       davfs2
       gcc15
       git
-      neovim-unwrapped
       ntfs3g
       wget
       xclip
