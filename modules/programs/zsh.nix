@@ -1,5 +1,19 @@
-{ ... }:
+{ pkgs, lib, ... }:
 {
+
+  # For sudo invoked by LLM agents
+  environment = {
+    systemPackages = with pkgs; [
+      zsh
+      oh-my-zsh
+
+      x11_ssh_askpass
+    ];
+    variables = {
+      SUDO_ASKPASS = "${lib.getExe' pkgs.x11_ssh_askpass "x11-ssh-askpass"}";
+    };
+  };
+
   programs.zsh = {
     enable = true;
 

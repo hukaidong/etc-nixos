@@ -10,4 +10,6 @@
     # Compress old journal files to save space
     Compress=yes
   '';
+
+  services.rsyslogd.enable = true;
 }
