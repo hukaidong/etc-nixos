@@ -3,6 +3,10 @@
 {
   fonts = {
     packages = with pkgs; [
+      fira-sans
+      fira-mono
+      fira-code
+
       noto-fonts
       noto-fonts-cjk-sans
       noto-fonts-cjk-serif
@@ -32,3 +36,4 @@
     };
   };
 }
+
