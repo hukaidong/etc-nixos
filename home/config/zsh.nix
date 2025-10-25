@@ -17,13 +17,10 @@
   home.sessionVariables = {
     EDITOR = "nvim";
     VISUAL = "nvim";
-    DOCKER_HOST = "unix:///run/podman/podman.sock";
     KUBECONFIG = "/etc/rancher/k3s/k3s.yaml";
   };
 
   home.shellAliases = {
     vim = "nvim";
   };
-
-  home.sessionPath = [ "/home/kaidong/bin" ];
 }

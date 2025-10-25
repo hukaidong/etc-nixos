@@ -12,5 +12,8 @@
       xsel
       zsh
     ];
+
+    homeBinInPath = true;
+    localBinInPath = true;
   };
 }
