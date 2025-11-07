@@ -12,6 +12,13 @@
       theme = "robbyrussell";
     };
     sessionVariables = { };
+
+    initContent = ''
+      # Source custom RC file if it exists
+      if [ -f "$HOME/.customrc" ]; then
+        source "$HOME/.customrc"
+      fi
+    '';
   };
 
   home.sessionVariables = {
