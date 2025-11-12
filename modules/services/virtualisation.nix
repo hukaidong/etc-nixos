@@ -23,17 +23,20 @@
   # See: https://docs.k3s.io/installation/requirements#networking
   networking.firewall = {
     # Trust CNI and Flannel interfaces
-    trustedInterfaces = [ "cni0" "flannel.1" ];
+    trustedInterfaces = [
+      "cni0"
+      "flannel.1"
+    ];
 
     allowedTCPPorts = [
-      6443   # Kubernetes API server
-      10250  # Kubelet metrics
+      6443 # Kubernetes API server
+      10250 # Kubelet metrics
     ];
 
     allowedUDPPorts = [
-      8472   # Flannel VXLAN
-      51820  # Flannel WireGuard (IPv4)
-      51821  # Flannel WireGuard (IPv6)
+      8472 # Flannel VXLAN
+      51820 # Flannel WireGuard (IPv4)
+      51821 # Flannel WireGuard (IPv6)
     ];
 
     extraCommands = ''
@@ -44,4 +47,9 @@
       iptables -A nixos-fw -s 10.43.0.0/16 -j nixos-fw-accept -m comment --comment "k3s service network"
     '';
   };
+
+  programs.virt-manager.enable = true;
+  users.groups.libvirtd.members = [ "kaidong" ];
+  virtualisation.libvirtd.enable = true;
+  virtualisation.spiceUSBRedirection.enable = true;
 }

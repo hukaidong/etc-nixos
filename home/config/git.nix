@@ -12,7 +12,10 @@
     enable = true;
     userName = "Kaidong Hu";
     userEmail = "hukaidonghkd@gmail.com";
-    attributes = [ "*.lock binary" ];
+    attributes = [
+      "*.lock binary"
+      "gemset.nix binary"
+    ];
     ignores = [
       # IntelliJ project files
       ".idea"
