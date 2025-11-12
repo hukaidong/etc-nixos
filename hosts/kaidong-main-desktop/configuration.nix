@@ -24,6 +24,7 @@ in
     ./davmail.nix
     ./filesystem.nix
     ./users.nix
+    ./virtualization.nix
   ];
 
   networking.hostName = "Kaidong-Main-Desktop";

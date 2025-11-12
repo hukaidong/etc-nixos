@@ -5,6 +5,7 @@
     age
     sops
     comma
+    nvd
     nixfmt-rfc-style
     nix-index
   ];
