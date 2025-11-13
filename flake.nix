@@ -71,5 +71,13 @@
           ./modules/all.nix
         ];
       };
+
+      # Virtualization module tests
+      checks.x86_64-linux = {
+        virtualization-tests = import ./tests/run-tests.nix {
+          inherit inputs;
+          pkgs = nixpkgs.legacyPackages.x86_64-linux;
+        };
+      };
     };
 }
