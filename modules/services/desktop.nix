@@ -28,6 +28,10 @@
 
   services.desktopManager.plasma6.enable = true;
 
+  # Troubleshooting flickering issues with nvidia drivers
+  # See https://nixos.wiki/wiki/Nvidia#Fix_app_flickering_with_Picom
+  services.picom.enable = true;
+
   services.displayManager.sddm.enable = true;
   services.displayManager.defaultSession = "plasma-i3wm+i3";
 

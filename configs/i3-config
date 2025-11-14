@@ -147,7 +147,9 @@ set $ws4 "4"
 set $ws5 "5"
 set $ws6 "6"
 set $ws7 "7"
+# Google Chrome Applications
 set $ws8 "8-GCHROM"
+# Communication Apps
 set $ws9 "9-COMM"
 set $ws10 "10"
 # }}}2
@@ -180,6 +182,7 @@ bindcode $mod+Shift+19 move container to workspace number $ws10
 
 # Workspace Assignments {{{2
 assign [class="discord"] → $ws9
+assign [class="telegram-desktop"] → $ws9
 # }}}2
 
 # Initial Workspace {{{2
@@ -219,14 +222,16 @@ for_window [title="win7"] floating enable, border none
 for_window [class="krunner"] floating enable, border none
 for_window [class="Kmix"] floating enable, border none
 for_window [class="Klipper"] floating enable, border none
-for_window [class="Plasmoidviewer"] floating enable, border none
 for_window [class="plasmashell" window_type="notification"] floating enable, border none, move right 700px, move down 450px
+for_window [class="Plasmoidviewer"] floating enable, border none
 no_focus [class="plasmashell" window_type="notification"]
 # }}}2
 
 # Applications {{{2
 for_window [class="(?i).*nextcloud.*"] floating disable
 for_window [title="Plover: Suggestions"] floating enable, border pixel 5, move scratchpad, move right 50px, move up 200px
+for_window [class="floating-kitty"] floating enable, border pixel 5
+no_focus [class="zoom"]
 # }}}2
 # }}}1
 
