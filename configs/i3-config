@@ -24,7 +24,8 @@ tiling_drag modifier titlebar
 # Keybindings {{{1
 # Application Launcher {{{2
 # bindsym $mod+e exec --no-startup-id i3-dmenu-desktop
-bindcode $mod+40 exec --no-startup-id i3-dmenu-desktop
+#bindcode $mod+40 exec --no-startup-id i3-dmenu-desktop
+bindcode $mod+40 exec --no-startup-id qdbus org.kde.krunner /App display
 # }}}2
 
 # Window Management - Basic {{{2

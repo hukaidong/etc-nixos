@@ -47,7 +47,8 @@
       "*.orig"
 
       # Claude
-      ".claude"
+      ".claude/*"
+      "!.claude/skills"
     ];
     extraConfig = {
       diff.tool = "nvimdiff";
