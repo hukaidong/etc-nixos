@@ -5,6 +5,7 @@
     gcc
     gnumake
     unzip
+    rclone
 
     # Development utilities
     bat
