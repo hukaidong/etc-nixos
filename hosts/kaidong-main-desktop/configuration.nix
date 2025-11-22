@@ -20,10 +20,9 @@ in
 
   imports = [
     ./hardware-configuration.nix
-    ./backup.nix
-    ./davmail.nix
     ./filesystem.nix
     ./users.nix
+    ./programs.nix
     ./virtualization.nix
   ];
 

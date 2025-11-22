@@ -13,6 +13,7 @@
   imports = [
     ./hardware-configuration.nix
     ./users.nix
+    ./programs.nix
   ];
 
   networking.hostName = "Kaidong-MBP14";
