@@ -19,28 +19,32 @@
 
   outputs =
     inputs@{
+      self,
       nixpkgs,
       nix-index-database,
       fakwin,
       ...
     }:
     let
-      unstableOverlay =
-        { ... }:
-        {
-          nixpkgs.overlays = [
-            (final: prev: {
-              unstable = import inputs.nixpkgs-unstable {
-                system = final.system;
-                config.allowUnfree = true;
-              };
-              ai-tools = inputs.nix-ai-tools.packages.${final.system};
-            })
-          ];
-        };
+      unstableOverlay = {
+        nixpkgs.overlays = [
+          (final: prev: {
+            unstable = import inputs.nixpkgs-unstable {
+              system = final.system;
+              config.allowUnfree = true;
+            };
+            ai-tools = inputs.nix-ai-tools.packages.${final.system};
+          })
+        ];
+      };
+
+      sysRevConfig = {
+        system.configurationRevision = self.rev or self.dirtyRev or null;
+      };
 
       commonNixModules = with inputs; [
         unstableOverlay
+        sysRevConfig
         fakwin.nixosModules.default
         home-manager.nixosModules.home-manager
         sops-nix.nixosModules.sops
