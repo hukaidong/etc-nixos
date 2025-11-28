@@ -29,6 +29,9 @@
       "*.swp"
       "tags"
 
+      # Emacs
+      ".auctex-auto"
+
       # R
       ".RData"
       ".Rhistory"
