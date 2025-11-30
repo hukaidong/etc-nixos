@@ -2,12 +2,11 @@
   description = "A simple NixOS flake";
 
   inputs = {
-    # NixOS official package source, using the nixos-25.05 branch here
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
     nix-ai-tools.url = "github:numtide/nix-ai-tools";
     fakwin.url = "github:DMaroo/fakwin";
-    home-manager.url = "github:nix-community/home-manager/release-25.05";
+    home-manager.url = "github:nix-community/home-manager/release-25.11";
     nix-index-database.url = "github:nix-community/nix-index-database";
     plover-flake.url = "github:openstenoproject/plover-flake";
     sops-nix.url = "github:Mic92/sops-nix";

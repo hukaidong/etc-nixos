@@ -29,5 +29,5 @@ in
   networking.hostName = "Kaidong-Main-Desktop";
 
   boot.kernelPackages = pkgs.linuxPackages_latest;
-  system.stateVersion = "25.05";
+  system.stateVersion = "25.11";
 }

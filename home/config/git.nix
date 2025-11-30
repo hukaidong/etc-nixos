@@ -10,8 +10,6 @@
 
   programs.git = {
     enable = true;
-    userName = "Kaidong Hu";
-    userEmail = "hukaidonghkd@gmail.com";
     attributes = [
       "*.lock binary"
       "gemset.nix binary"
@@ -53,7 +51,9 @@
       ".claude/*"
       "!.claude/skills"
     ];
-    extraConfig = {
+    settings = {
+      user.name = "Kaidong Hu";
+      user.email = "hukaidonghkd@gmail.com";
       diff.tool = "nvimdiff";
       merge.tool = "nvimdiff";
     };

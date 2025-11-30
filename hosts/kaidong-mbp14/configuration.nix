@@ -27,7 +27,7 @@
   ];
   boot.tmp.useTmpfs = false;
 
-  system.stateVersion = "25.05";
+  system.stateVersion = "25.11";
 
   programs.nix-index-database.comma.enable = true;
 }
