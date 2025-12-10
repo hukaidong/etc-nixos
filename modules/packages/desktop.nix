@@ -5,6 +5,7 @@
     # polonium
     telegram-desktop
     obs-studio
+    mpv
 
     # Fast developing application using unstable packages
     unstable.code-cursor-fhs
