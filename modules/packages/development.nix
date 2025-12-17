@@ -6,13 +6,15 @@
     gnumake
     unzip
     rclone
-    devenv
+
+    # devenv perfers unstable packages for quicker iteration
+    unstable.devenv
 
     # Development utilities
     bat
+    btop
     fd
     fzf
-    btop
     htop
     jq
     ripgrep
