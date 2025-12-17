@@ -13,11 +13,11 @@ let
   integrationTest = import ./modules/integration-test.nix { inherit pkgs lib; };
 
   # Create test driver for each test
-  makeTest = test: (pkgs.nixosTest test);
+  makeTest = test: (pkgs.testers.nixosTest test);
 
 in
 # Return the main test derivation
-pkgs.nixosTest {
+pkgs.testers.nixosTest {
   name = "virtualization-module-tests";
 
   nodes = {
