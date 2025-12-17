@@ -6,11 +6,13 @@
     gnumake
     unzip
     rclone
+    devenv
 
     # Development utilities
     bat
     fd
     fzf
+    btop
     htop
     jq
     ripgrep
