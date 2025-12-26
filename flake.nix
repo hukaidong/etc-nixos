@@ -4,6 +4,7 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs-ruby.url = "github:bobvanderlinden/nixpkgs-ruby";
     nix-ai-tools.url = "github:numtide/nix-ai-tools";
     fakwin.url = "github:DMaroo/fakwin";
     home-manager.url = "github:nix-community/home-manager/release-25.11";
@@ -33,6 +34,9 @@
               config.allowUnfree = true;
             };
             ai-tools = inputs.nix-ai-tools.packages.${final.system};
+            ruby-custom = (inputs.nixpkgs-ruby.packages.${final.system}."ruby-4.0.0").override {
+              docSupport = true;
+            };
           })
         ];
       };
