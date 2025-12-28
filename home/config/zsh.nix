@@ -7,7 +7,9 @@
       enable = true;
       theme = lib.mkDefault "robbyrussell";
     };
-    sessionVariables = { };
+    sessionVariables = {
+      ZSH_CUSTOM = ../../configs/omz-custom;
+    };
 
     initContent = ''
       # Source custom RC file if it exists

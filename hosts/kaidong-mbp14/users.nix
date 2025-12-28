@@ -31,4 +31,7 @@
 
   # Install firefox.
   programs.firefox.enable = true;
+
+  # Visual distinguished from Main-Desktop
+  home-manager.users.kaidong.programs.zsh.oh-my-zsh.theme = "robbyrussell-lambda";
 }
