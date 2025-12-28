@@ -1,6 +1,5 @@
 { pkgs, lib, ... }:
 {
-
   # For sudo invoked by LLM agents
   environment = {
     systemPackages = with pkgs; [
@@ -14,6 +13,7 @@
     };
   };
 
+  # Generic zsh configuration for all users
   programs.zsh = {
     enable = true;
 
@@ -24,9 +24,7 @@
 
     shellAliases = {
       nixb = "sudo nixos-rebuild";
-      nixh = "( pushd /etc/nixos > /dev/null ; sudo nix flake update home; popd > /dev/null )";
-      nixs = "xdg-open https://search.nixos.org/packages";
-      groot = "cd $(git rev-parse --show-toplevel)";
+      groot = "git status >/dev/null && cd $(git rev-parse --show-toplevel)";
     };
   };
 }

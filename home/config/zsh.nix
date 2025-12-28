@@ -1,15 +1,11 @@
-{ pkgs, ... }:
-# TODO: There's a duplicate zsh configuration in module/program/zsh.nix,
-# Research and merge them together.
-# home.* should be used for user specific configuration
-# and program.* should be configured for cross-user settings.
+{ pkgs, lib, ... }:
 {
   programs.zsh = {
     enable = true;
     enableCompletion = true;
     oh-my-zsh = {
       enable = true;
-      theme = "robbyrussell";
+      theme = lib.mkDefault "robbyrussell";
     };
     sessionVariables = { };
 
@@ -29,5 +25,10 @@
 
   home.shellAliases = {
     vim = "nvim";
+
+    gs = "git status";
+    gd = "git diff";
+    gdd = "git diff --cached";
+    gl = "git log --oneline --graph --decorate";
   };
 }
