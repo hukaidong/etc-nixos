@@ -1,0 +1,59 @@
+NixOS Configuration
+===================
+
+This repository contains a declarative NixOS configuration built around
+the Nix flake system. It manages multiple machines from a single codebase,
+sharing common infrastructure while allowing host-specific customizations.
+
+
+Philosophy
+----------
+
+The configuration follows a modular architecture where each concern is
+isolated into its own file. System modules handle services, packages, and
+system-level settings, while home-manager modules manage user-specific
+dotfiles and applications. This separation allows changes to propagate
+predictably across all managed systems.
+
+Secrets are never stored in plaintext. The configuration integrates with
+SOPS for encrypted secret management using Age keys, ensuring sensitive
+credentials remain secure even in version control.
+
+
+Structure
+---------
+
+The repository organizes code by purpose rather than by machine. The hosts
+directory contains hardware-specific configurations and the minimal glue
+needed to assemble a complete system. The modules directory holds reusable
+components that can be enabled or disabled per host. The home directory
+manages user environment configuration through home-manager.
+
+This design means adding a new machine requires only a small host-specific
+configuration that imports the relevant shared modules. Common patterns and
+packages are defined once and inherited everywhere.
+
+
+Workflow
+--------
+
+The flake pins all dependencies to specific revisions, ensuring builds are
+reproducible across time and machines. An unstable overlay provides access
+to rapidly-evolving packages without compromising system stability.
+
+System rebuilds pull from the locked inputs, and the configuration tracks
+its own git revision for auditability. Integration tests verify that core
+services start correctly before changes reach production machines.
+
+
+Extending
+---------
+
+New modules should follow the existing pattern of defining options under a
+consistent namespace and using conditional configuration. This allows
+features to be toggled per-host without code duplication.
+
+When adding packages or services, prefer placing them in the appropriate
+thematic module rather than creating new files for small additions. The
+goal is maintainability through organization, not through proliferation
+of configuration files.

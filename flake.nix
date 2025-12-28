@@ -1,5 +1,5 @@
 {
-  description = "A simple NixOS flake";
+  description = "Modular NixOS configuration managing multiple machines with shared infrastructure";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
