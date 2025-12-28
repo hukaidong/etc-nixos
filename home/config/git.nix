@@ -48,7 +48,7 @@
       "*.orig"
 
       # Claude
-      ".claude/*"
+      "**/.claude/*"
       "!.claude/skills"
     ];
     settings = {
