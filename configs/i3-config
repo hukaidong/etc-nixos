@@ -214,6 +214,9 @@ exec i3-msg workspace $ws1
 # Status Bar {{{2
 bar {
         font pango:Noto Serif 10
+        mode hide
+        padding 20px 0 0 0
+        position bottom
         separator_symbol ":|:"
         status_command i3status
 }
