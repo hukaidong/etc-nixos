@@ -5,7 +5,7 @@
     enable = true;
 
     # Use plover package with additional plugins
-    package = plover-flake.packages.${pkgs.system}.plover.withPlugins (
+    package = plover-flake.packages.${pkgs.stdenv.hostPlatform.system}.plover.withPlugins (
       ps: with ps; [
         plover-lapwing-aio # Lapwing stenography theory
         plover-clippy-2

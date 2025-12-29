@@ -28,16 +28,22 @@
     let
       unstableOverlay = {
         nixpkgs.overlays = [
-          (final: prev: {
-            unstable = import inputs.nixpkgs-unstable {
-              system = final.system;
-              config.allowUnfree = true;
-            };
-            ai-tools = inputs.nix-ai-tools.packages.${final.system};
-            ruby-custom = (inputs.nixpkgs-ruby.packages.${final.system}."ruby-4.0.0").override {
-              docSupport = true;
-            };
-          })
+          (
+            final: prev:
+            let
+              system = final.stdenv.hostPlatform.system;
+            in
+            {
+              unstable = import inputs.nixpkgs-unstable {
+                inherit system;
+                config.allowUnfree = true;
+              };
+              ai-tools = inputs.nix-ai-tools.packages.${system};
+              ruby-custom = (inputs.nixpkgs-ruby.packages.${system}."ruby-4.0.0").override {
+                docSupport = true;
+              };
+            }
+          )
         ];
       };
 
