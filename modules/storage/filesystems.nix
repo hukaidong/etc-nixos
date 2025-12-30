@@ -8,7 +8,7 @@
   ];
   services.davfs2.enable = true;
   fileSystems."/mnt/datadav" = {
-    device = "https://webdav.hukaidong.com";
+    device = "https://dav.hukaidong.com";
     fsType = "davfs";
     options = [
       "auto"

@@ -15,5 +15,10 @@
     mode = "0400";
     owner = "kaidong";
   };
-}
 
+  sops.secrets."digix-nix-key" = {
+    path = "/etc/nix/digix-nix.key";
+    mode = "0400";
+    owner = "root";
+  };
+}
