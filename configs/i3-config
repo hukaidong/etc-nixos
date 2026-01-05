@@ -63,8 +63,8 @@ bindcode $mod+Shift+33 move right
 # Layout Management {{{2
 # bindsym $mod+s layout stacking
 bindcode $mod+47 layout stacking
-# bindsym $mod+comma layout tabbed
-bindcode $mod+25 layout tabbed
+# bindsym $mod+comma layout toggle stacking tabbed
+bindcode $mod+25 layout toggle stacking tabbed
 # bindsym $mod+period layout toggle split
 bindcode $mod+26 layout toggle split
 # bindsym $mod+v split vertical
