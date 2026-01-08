@@ -30,8 +30,8 @@ bindcode $mod+40 exec --no-startup-id qdbus org.kde.krunner /App display
 # Application Shortcuts {{{2
 # bindsym $mod+Shift+E exec emacs
 bindcode $mod+Shift+40 exec emacs
-# bindsym $mod+Shift+K exec keepassxc
-bindcode $mod+Shift+55 exec keepassxc
+# bindsym $mod+Shift+C exec keepassxc
+bindcode $mod+Shift+31 exec keepassxc
 # }}}2
 
 # Window Management - Basic {{{2
