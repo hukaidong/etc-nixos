@@ -23,9 +23,15 @@ tiling_drag modifier titlebar
 
 # Keybindings {{{1
 # Application Launcher {{{2
-# bindsym $mod+e exec --no-startup-id i3-dmenu-desktop
-#bindcode $mod+40 exec --no-startup-id i3-dmenu-desktop
+# bindsym $mod+e exec --no-startup-id qdbus org.kde.krunner /App display
 bindcode $mod+40 exec --no-startup-id qdbus org.kde.krunner /App display
+# }}}2
+
+# Application Shortcuts {{{2
+# bindsym $mod+Shift+E exec emacs
+bindcode $mod+Shift+40 exec emacs
+# bindsym $mod+Shift+K exec keepassxc
+bindcode $mod+Shift+55 exec keepassxc
 # }}}2
 
 # Window Management - Basic {{{2
@@ -252,7 +258,6 @@ no_focus [class="plasmashell" window_type="notification"]
 
 # Applications {{{2
 for_window [class="(?i).*nextcloud.*"] floating disable
-
 for_window [title="Plover: Suggestions"] floating enable, border pixel 5, move scratchpad, move right 50px, move up 200px
 for_window [class="floating-kitty"] floating enable, border pixel 5
 for_window [title="Git Glance"] floating enable, border pixel 5

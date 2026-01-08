@@ -25,6 +25,10 @@
     KUBECONFIG = "/etc/rancher/k3s/k3s.yaml";
   };
 
+  home.sessionPath = [
+    "$HOME/.config/emacs/bin" # Doom Emacs
+  ];
+
   home.shellAliases = {
     vim = "nvim";
 
