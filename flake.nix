@@ -11,6 +11,7 @@
     nix-index-database.url = "github:nix-community/nix-index-database";
     plover-flake.url = "github:openstenoproject/plover-flake";
     sops-nix.url = "github:Mic92/sops-nix";
+    fontconfig.url = "github:hukaidong/flake-fonts";
 
     nix-index-database.inputs.nixpkgs.follows = "nixpkgs";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
@@ -26,7 +27,7 @@
       ...
     }:
     let
-      unstableOverlay = {
+      extraPkgsOverlay = {
         nixpkgs.overlays = [
           (
             final: prev:
@@ -34,14 +35,18 @@
               system = final.stdenv.hostPlatform.system;
             in
             {
+              # Custom package collections
               unstable = import inputs.nixpkgs-unstable {
                 inherit system;
                 config.allowUnfree = true;
               };
               ai-tools = inputs.nix-ai-tools.packages.${system};
+
+              # Custom packages
               ruby-custom = (inputs.nixpkgs-ruby.packages.${system}."ruby-4.0.0").override {
                 docSupport = true;
               };
+              myfonts = inputs.fontconfig.packages.${system}.default;
             }
           )
         ];
@@ -52,7 +57,7 @@
       };
 
       commonNixModules = with inputs; [
-        unstableOverlay
+        extraPkgsOverlay
         sysRevConfig
         fakwin.nixosModules.default
         home-manager.nixosModules.home-manager
