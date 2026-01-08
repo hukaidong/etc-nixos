@@ -21,4 +21,16 @@
     mode = "0400";
     owner = "root";
   };
+
+  sops.secrets."nix-access-tokens" = {
+    path = "/etc/nix/nixAccessToken";
+    mode = "0400";
+    owner = "root";
+  };
+
+  sops.secrets."nix-access-tokens-user" = {
+    key = "nix-access-tokens";
+    mode = "0400";
+    owner = "kaidong";
+  };
 }
