@@ -12,6 +12,7 @@
     unstable.antigravity-fhs
 
     # Daily updated nix ai tool sets
+    ai-tools.codex
     ai-tools.opencode
     ai-tools.claude-code
     ai-tools.cursor-agent

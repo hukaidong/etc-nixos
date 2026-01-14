@@ -42,6 +42,7 @@ in
       [
         tex
         (emacs.pkgs.withPackages (epkgs: [ epkgs.mu4e ]))
+        libnotify
       ]
       ++ lib.optionals cfg.enableMailSupport [
         davmail

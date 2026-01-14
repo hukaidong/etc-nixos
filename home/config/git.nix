@@ -50,6 +50,11 @@
       # Claude
       "**/.claude/*"
       "!.claude/skills"
+      "CLAUDE.md"
+
+      # OpenCode
+      "AGENTS.md"
+
     ];
     settings = {
       user.name = "Kaidong Hu";
