@@ -29,5 +29,9 @@ in
   networking.hostName = "Kaidong-Main-Desktop";
 
   boot.kernelPackages = pkgs.linuxPackages_latest;
+
+  # Inhibit shutdown during work hours (9am-9pm)
+  services.shutdownInhibit.enable = true;
+
   system.stateVersion = "25.11";
 }
