@@ -3,18 +3,6 @@
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
 { config, pkgs, ... }:
-let
-  linux_6_12_pinned = pkgs.linux_6_12.override {
-    argsOverride = rec {
-      src = pkgs.fetchurl {
-        url = "mirror://kernel/linux/kernel/v6.x/linux-${version}.tar.xz";
-        sha256 = "sha256-j5WoVJz737icEYGh9VqXHwTfzWKVCKLtcLd3q5L52z4=";
-      };
-      version = "6.12.45";
-      modDirVersion = "6.12.45";
-    };
-  };
-in
 {
   nixpkgs.config.allowUnfree = true;
 
