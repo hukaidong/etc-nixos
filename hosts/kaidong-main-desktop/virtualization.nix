@@ -19,5 +19,7 @@
     podmanCompose.enable = true;
 
     virtManager.enable = true;
+
+    distrobox.enable = true;
   };
 }

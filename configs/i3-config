@@ -262,6 +262,7 @@ for_window [class="(?i).*nextcloud.*"] floating disable
 for_window [title="Plover: Suggestions"] floating enable, border pixel 5, move scratchpad, move right 50px, move up 200px
 for_window [class="floating-kitty"] floating enable, border pixel 5
 for_window [title="Git Glance"] floating enable, border pixel 5
+for_window [class="steam"] floating enable, border pixel 5
 no_focus [class="zoom"]
 # }}}2
 # }}}1
