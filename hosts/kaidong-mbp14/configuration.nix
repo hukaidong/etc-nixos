@@ -30,4 +30,6 @@
   system.stateVersion = "25.11";
 
   programs.nix-index-database.comma.enable = true;
+
+  kaidong-desktop.desktopEnvironment.plasma-i3.enable = true;
 }

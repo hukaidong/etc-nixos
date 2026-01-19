@@ -22,6 +22,9 @@
   services.shutdownInhibit.enable = true;
 
   programs.steam.enable = true;
+  programs.steam.protontricks.enable = true;
+
+  kaidong-desktop.desktopEnvironment.plasma6.enable = true;
 
   system.stateVersion = "25.11";
 }
