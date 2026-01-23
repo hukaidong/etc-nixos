@@ -51,6 +51,7 @@
       "**/.claude/*"
       "!.claude/skills"
       "CLAUDE.md"
+      "CLAUDE.local.md"
 
       # OpenCode
       "AGENTS.md"
