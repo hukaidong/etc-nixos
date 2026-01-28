@@ -63,8 +63,28 @@
         home-manager.nixosModules.home-manager
         sops-nix.nixosModules.sops
       ];
+      mkUpdateCommand =
+        pkgs:
+        pkgs.writeShellScriptBin "update" ''
+          set -e
+          nix flake update
+          git commit -am "chore: Update flake.lock"
+          git push
+        '';
     in
     {
+      devShells.x86_64-linux.default =
+        let
+          pkgs = nixpkgs.legacyPackages.x86_64-linux;
+          update-command = mkUpdateCommand pkgs;
+        in
+        pkgs.mkShell {
+          packages = [ update-command ];
+          shellHook = ''
+            echo "NixOS config shell loaded. Run 'update' to update flake.lock and push."
+          '';
+        };
+
       # Please replace my-nixos with your hostname
       nixosConfigurations.Kaidong-Main-Desktop = nixpkgs.lib.nixosSystem {
         specialArgs = {
