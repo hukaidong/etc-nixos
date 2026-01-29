@@ -116,12 +116,6 @@
           inherit inputs;
           pkgs = nixpkgs.legacyPackages.x86_64-linux;
         };
-        shutdown-inhibit-tests = nixpkgs.legacyPackages.x86_64-linux.testers.nixosTest (
-          import ./tests/modules/shutdown-inhibit-test.nix {
-            pkgs = nixpkgs.legacyPackages.x86_64-linux;
-            lib = nixpkgs.legacyPackages.x86_64-linux.lib;
-          }
-        );
       };
     };
 }

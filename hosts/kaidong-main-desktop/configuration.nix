@@ -21,9 +21,6 @@ in
 
   boot.kernelPackages = pkgs.linuxPackages_latest;
 
-  # Inhibit shutdown during work hours (9am-9pm)
-  services.shutdownInhibit.enable = true;
-
   programs.steam.enable = true;
   programs.steam.protontricks.enable = true;
 
