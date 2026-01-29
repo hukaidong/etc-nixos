@@ -3,10 +3,19 @@
   programs.zsh = {
     enable = true;
     enableCompletion = true;
+
+    plugins = [
+      {
+        name = "fzf-tab";
+        src = "${pkgs.zsh-fzf-tab}/share/fzf-tab";
+      }
+    ];
+
     oh-my-zsh = {
       enable = true;
       theme = lib.mkDefault "robbyrussell";
     };
+
     sessionVariables = {
       ZSH_CUSTOM = ../../configs/omz-custom;
     };
