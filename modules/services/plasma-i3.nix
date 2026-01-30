@@ -23,7 +23,7 @@ in
           i3status
           picom
         ];
-        configFile = ../../configs/i3-config;
+        configFile = ../../configs/i3-plasma-config;
       };
       desktopManager.session = [
         {

@@ -1,3 +1,5 @@
+# i3 config file (v4)
+#
 # Please see https://i3wm.org/docs/userguide.html for a complete reference!
 
 # General Settings {{{1
@@ -22,8 +24,8 @@ tiling_drag modifier titlebar
 
 # Keybindings {{{1
 # Application Launcher {{{2
-# bindsym $mod+e exec --no-startup-id i3-dmenu-desktop
-bindcode $mod+40 exec --no-startup-id i3-dmenu-desktop
+# bindsym $mod+e exec --no-startup-id qdbus org.kde.krunner /App display
+bindcode $mod+40 exec --no-startup-id qdbus org.kde.krunner /App display
 # }}}2
 
 # Application Shortcuts {{{2
@@ -219,9 +221,9 @@ exec i3-msg workspace $ws1
 # Status Bar {{{2
 bar {
         font pango:Noto Serif 10
-        tray_output primary
-        tray_padding 3
-        position top
+        mode hide
+        padding 20px 0 0 0
+        position bottom
         separator_symbol ":|:"
         status_command i3status
 }

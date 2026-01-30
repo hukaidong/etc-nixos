@@ -24,8 +24,9 @@ in
   programs.steam.enable = true;
   programs.steam.protontricks.enable = true;
 
-  kaidong-desktop.desktopEnvironment.plasma-i3.enable = usei3;
-  kaidong-desktop.desktopEnvironment.plasma6.enable = !usei3;
+  kaidong-desktop.desktopEnvironment.i3.enable = true;
+  kaidong-desktop.desktopEnvironment.plasma-i3.enable = false;
+  kaidong-desktop.desktopEnvironment.plasma6.enable = false;
 
   system.stateVersion = "25.11";
 }
