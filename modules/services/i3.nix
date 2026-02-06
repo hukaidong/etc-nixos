@@ -55,6 +55,8 @@ in
       services.dunst.enable = true;
 
       services.displayManager.sddm.enable = true;
+
+      services.autorandr.enable = true;
     })
   ];
 }
