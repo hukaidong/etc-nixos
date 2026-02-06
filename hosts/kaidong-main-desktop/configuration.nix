@@ -2,10 +2,7 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, pkgs, ... }:
-let
-  usei3 = false;
-in
+{ config, pkgs, desktopEnvironment ? "i3", ... }:
 {
   nixpkgs.config.allowUnfree = true;
 
@@ -24,9 +21,9 @@ in
   programs.steam.enable = true;
   programs.steam.protontricks.enable = true;
 
-  kaidong-desktop.desktopEnvironment.i3.enable = true;
-  kaidong-desktop.desktopEnvironment.plasma-i3.enable = false;
-  kaidong-desktop.desktopEnvironment.plasma6.enable = false;
+  kaidong-desktop.desktopEnvironment.i3.enable = desktopEnvironment == "i3";
+  kaidong-desktop.desktopEnvironment.plasma-i3.enable = desktopEnvironment == "plasma-i3";
+  kaidong-desktop.desktopEnvironment.plasma6.enable = desktopEnvironment == "plasma6";
 
   system.stateVersion = "25.11";
 }

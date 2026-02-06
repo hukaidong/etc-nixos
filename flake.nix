@@ -85,10 +85,24 @@
           '';
         };
 
-      # Please replace my-nixos with your hostname
+      # Main desktop with pure i3
       nixosConfigurations.Kaidong-Main-Desktop = nixpkgs.lib.nixosSystem {
         specialArgs = {
           inherit inputs;
+          desktopEnvironment = "i3";
+        };
+        modules = commonNixModules ++ [
+          ./home/home.nix
+          ./hosts/kaidong-main-desktop/configuration.nix
+          ./modules/all.nix
+        ];
+      };
+
+      # Main desktop with Plasma 6
+      nixosConfigurations.Kaidong-Main-Desktop-Plasma = nixpkgs.lib.nixosSystem {
+        specialArgs = {
+          inherit inputs;
+          desktopEnvironment = "plasma6";
         };
         modules = commonNixModules ++ [
           ./home/home.nix
