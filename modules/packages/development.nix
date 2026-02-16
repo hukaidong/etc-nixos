@@ -19,5 +19,8 @@
     jq
     ripgrep
     tree
+
+    rlwrap
+    sqlite
   ];
 }

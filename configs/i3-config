@@ -176,7 +176,7 @@ set $ws7 "7"
 set $ws8 "8-GCHROM"
 # Communication Apps
 set $ws9 "9-COMM"
-set $ws10 "10"
+set $ws10 "10-GAME"
 # }}}2
 
 # Workspace Switching {{{2
@@ -262,6 +262,10 @@ for_window [class="floating-kitty"] floating enable, border pixel 5
 for_window [title="Git Glance"] floating enable, border pixel 5
 for_window [class="steam"] floating enable, border pixel 5
 no_focus [class="zoom"]
+# }}}2
+
+# Workspace-specific Rules {{{2
+for_window [workspace=$ws10] floating enable
 # }}}2
 # }}}1
 
