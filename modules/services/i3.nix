@@ -50,6 +50,15 @@ in
         };
       };
 
+      environment.etc."i3/workspace-layout.sh" = {
+        source = ../../configs/i3-workspace-layout.sh;
+        mode = "0755";
+      };
+
+      environment.etc."i3/wallpapers" = {
+        source = ../../configs/wallpapers;
+      };
+
       services.picom.enable = true;
 
       services.dunst.enable = true;

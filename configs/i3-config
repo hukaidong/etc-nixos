@@ -11,7 +11,8 @@ font pango:Noto Serif, Demi Bold 8
 exec --no-startup-id dbus-update-activation-environment --all
 exec --no-startup-id dex --autostart --environment i3
 exec --no-startup-id xss-lock --transfer-sleep-lock -- i3lock --nofork
-exec --no-startup-id feh --recursive --bg-fill --randomize /etc/nixos/configs/wallpapers/
+exec --no-startup-id feh --recursive --bg-fill --randomize /etc/i3/wallpapers/
+exec --no-startup-id /etc/i3/workspace-layout.sh
 # }}}2
 
 # Mouse and Drag Settings {{{2
@@ -109,6 +110,11 @@ bindcode $mod+58 exec i3-input -F 'mark %s' -l 1 -P 'Mark: '
 bindcode $mod+30 exec i3-input -F '[con_mark="%s"] focus' -l 1 -P 'Goto: '
 # bindsym $mod+p exec i3-input -F 'move window to mark %s' -l 1 -P 'Move to: '
 bindcode $mod+27 exec i3-input -F 'move window to mark %s' -l 1 -P 'Move to: '
+# }}}2
+
+# Keyboard Layout Toggle {{{2
+# bindsym $mod+semicolon toggle between dvp and qwerty
+bindcode $mod+24 exec --no-startup-id "setxkbmap -query | grep -q 'variant.*dvp' && setxkbmap -layout us || setxkbmap -layout us -variant dvp"
 # }}}2
 
 # Resize Mode {{{2
