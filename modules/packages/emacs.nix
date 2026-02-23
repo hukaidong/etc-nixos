@@ -24,6 +24,8 @@ let
       #(setq org-preview-latex-default-process 'dvisvgm)
     }
   );
+
+  emacsPackage = pkgs.emacs.pkgs.withPackages (epkgs: [ epkgs.mu4e ]);
 in
 {
   options.kaidong-desktop.programs.emacs = {
@@ -34,20 +36,35 @@ in
       default = false;
       description = "Enable mail support with mu4e, davmail, and isync";
     };
+
+    enableService = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "Enable the Emacs daemon service with emacsclient as default editor";
+    };
   };
 
   config = lib.mkIf cfg.enable {
     environment.systemPackages =
-      with pkgs;
       [
         tex
-        (emacs.pkgs.withPackages (epkgs: [ epkgs.mu4e ]))
-        libnotify
+        emacsPackage
+        pkgs.libnotify
       ]
-      ++ lib.optionals cfg.enableMailSupport [
-        davmail
-        isync
-        mu
-      ];
+      ++ lib.optionals cfg.enableMailSupport (
+        with pkgs;
+        [
+          davmail
+          isync
+          mu
+        ]
+      );
+
+    services.emacs = lib.mkIf cfg.enableService {
+      enable = true;
+      package = emacsPackage;
+      defaultEditor = true;
+      startWithGraphical = true;
+    };
   };
 }

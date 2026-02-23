@@ -29,8 +29,6 @@
   };
 
   home.sessionVariables = {
-    EDITOR = "nvim";
-    VISUAL = "nvim";
     KUBECONFIG = "/etc/rancher/k3s/k3s.yaml";
   };
 
@@ -40,10 +38,12 @@
 
   home.shellAliases = {
     vim = "nvim";
+    e = "emacsclient -c -n";
 
     gs = "git status";
     gd = "git diff";
     gdd = "git diff --cached";
     gl = "git log --oneline --graph --decorate";
+    gca = "git commit --amend";
   };
 }

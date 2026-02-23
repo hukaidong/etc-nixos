@@ -4,6 +4,7 @@ with pkgs;
   kaidong-desktop.programs.emacs = {
     enable = true;
     enableMailSupport = true;
+    enableService = true;
   };
 
   kaidong-desktop.services = {
