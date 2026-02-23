@@ -28,7 +28,7 @@ in
     (lib.mkIf cfg.enable {
       environment.systemPackages = with pkgs; [
         kdePackages.kwallet
-        kdePackages.dolphin
+        xfce.thunar
       ];
 
       services.xserver = {
