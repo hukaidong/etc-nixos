@@ -11,6 +11,7 @@ font pango:Noto Serif, Demi Bold 8
 exec --no-startup-id dbus-update-activation-environment --all
 exec --no-startup-id dex --autostart --environment i3
 exec --no-startup-id xss-lock --transfer-sleep-lock -- i3lock --nofork
+exec --no-startup-id autorandr --change
 exec --no-startup-id feh --recursive --bg-fill --randomize /etc/i3/wallpapers/
 exec --no-startup-id /etc/i3/workspace-layout.sh
 # }}}2

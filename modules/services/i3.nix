@@ -66,6 +66,7 @@ in
       services.displayManager.sddm.enable = true;
 
       services.autorandr.enable = true;
+      systemd.services.autorandr.enable = false;
     })
   ];
 }
