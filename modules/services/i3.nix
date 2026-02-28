@@ -28,7 +28,6 @@ in
     (lib.mkIf cfg.enable {
       environment.systemPackages = with pkgs; [
         kdePackages.kwallet
-        xfce.thunar
       ];
 
       services.xserver = {
@@ -59,13 +58,24 @@ in
         source = ../../configs/wallpapers;
       };
 
-      services.picom.enable = true;
+      services = {
+        picom.enable = true;
+        dunst.enable = true;
+        displayManager.sddm.enable = true;
+        autorandr.enable = true;
+        gvfs.enable = true;
+        tumbler.enable = true;
+      };
 
-      services.dunst.enable = true;
+      programs = {
+        thunar.enable = true;
+        thunar.plugins = with pkgs.xfce; [
+          thunar-archive-plugin
+          thunar-media-tags-plugin
+          thunar-volman
+        ];
+      };
 
-      services.displayManager.sddm.enable = true;
-
-      services.autorandr.enable = true;
       systemd.services.autorandr.enable = false;
     })
   ];
