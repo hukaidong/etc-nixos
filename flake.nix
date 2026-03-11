@@ -16,6 +16,7 @@
     nix-index-database.inputs.nixpkgs.follows = "nixpkgs";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
     fakwin.inputs.nixpkgs.follows = "nixpkgs";
+    fontconfig.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs =
