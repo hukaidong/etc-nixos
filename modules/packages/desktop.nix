@@ -7,11 +7,13 @@
     obs-studio
     mpv
 
+    # I might not need those cli now but might regret later
+    # so they are just commented and might be removed later
     # Fast developing application using unstable packages
-    unstable.antigravity-fhs
+    # unstable.antigravity-fhs
 
     # Daily updated nix ai tool sets
-    ai-tools.codex
+    # ai-tools.codex
     ai-tools.opencode
     ai-tools.claude-code
 

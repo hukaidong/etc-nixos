@@ -3,6 +3,7 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
+    nixpkgs-before-minizip.url = "github:NixOS/nixpkgs/1267bb4920d0fc06ea916734c11b0bf004bbe17e";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
     nixpkgs-ruby.url = "github:bobvanderlinden/nixpkgs-ruby";
     nix-ai-tools.url = "github:numtide/nix-ai-tools";
@@ -48,6 +49,8 @@
                 docSupport = true;
               };
               myfonts = inputs.fontconfig.packages.${system}.default;
+
+              telegram-desktop = inputs.nixpkgs-before-minizip.legacyPackages.${system}.telegram-desktop;
             }
           )
         ];

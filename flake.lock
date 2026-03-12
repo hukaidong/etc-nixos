@@ -287,6 +287,22 @@
         "type": "github"
       }
     },
+    "nixpkgs-before-minizip": {
+      "locked": {
+        "lastModified": 1772047000,
+        "narHash": "sha256-7DaQVv4R97cii/Qdfy4tmDZMB2xxtyIvNGSwXBBhSmo=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "1267bb4920d0fc06ea916734c11b0bf004bbe17e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "1267bb4920d0fc06ea916734c11b0bf004bbe17e",
+        "type": "github"
+      }
+    },
     "nixpkgs-lib": {
       "locked": {
         "lastModified": 1753579242,
@@ -497,6 +513,7 @@
         "nix-ai-tools": "nix-ai-tools",
         "nix-index-database": "nix-index-database",
         "nixpkgs": "nixpkgs_2",
+        "nixpkgs-before-minizip": "nixpkgs-before-minizip",
         "nixpkgs-ruby": "nixpkgs-ruby",
         "nixpkgs-unstable": "nixpkgs-unstable",
         "plover-flake": "plover-flake",
