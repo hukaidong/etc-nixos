@@ -49,8 +49,6 @@
                 docSupport = true;
               };
               myfonts = inputs.fontconfig.packages.${system}.default;
-
-              telegram-desktop = inputs.nixpkgs-before-minizip.legacyPackages.${system}.telegram-desktop;
             }
           )
         ];
