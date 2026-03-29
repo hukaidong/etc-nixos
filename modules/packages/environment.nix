@@ -8,6 +8,7 @@
       git
       ntfs3g
       wget
+      pipx
       xclip
       xsel
       zsh
