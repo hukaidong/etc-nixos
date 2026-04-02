@@ -6,6 +6,8 @@
     telegram-desktop
     obs-studio
     mpv
+    maim
+    flameshot
 
     # I might not need those cli now but might regret later
     # so they are just commented and might be removed later
@@ -19,5 +21,13 @@
 
     # required by opencode
     bun
+
+    # paper document scanning
+    xsane
+    unpaper
+    imagemagick
+    ocrmypdf
+    ghostscript
+    poppler-utils
   ];
 }
