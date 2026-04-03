@@ -15,6 +15,7 @@
       ]
     ))
     pipenv
+    pipx
 
     rustc
     cargo
