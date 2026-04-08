@@ -1,47 +1,32 @@
+{ standalone ? false }:
 {
-  inputs,
   pkgs,
   lib,
+  homePath,
   ...
 }:
+let
+  collectNixFiles = dir: lib.filesystem.listFilesRecursive dir;
+
+  configFiles = collectNixFiles ./config;
+  packageFiles = collectNixFiles ./packages;
+  standaloneFiles = if standalone then collectNixFiles ./standalone else [ ];
+
+  moduleFiles = builtins.filter (path: lib.hasSuffix ".nix" (toString path)) (
+    configFiles ++ packageFiles ++ standaloneFiles
+  );
+in
 {
-  home-manager.useGlobalPkgs = true;
-  home-manager.useUserPackages = true;
+  imports = moduleFiles;
 
-  home-manager.backupFileExtension = "pre-homemanager";
-
-  home-manager.sharedModules = [
-    inputs.plover-flake.homeManagerModules.plover
-    inputs.sops-nix.homeManagerModules.sops
-  ];
-
-  home-manager.extraSpecialArgs =
-    let
-      pkgs-unstable = import inputs.nixpkgs-unstable {
-        inherit (pkgs) system;
-        config = {
-          allowUnfree = true;
-        };
-      };
-    in
+  config = lib.mkMerge [
     {
-      inherit pkgs-unstable;
-      inherit (inputs) plover-flake;
-      homePath = "/home";
-    };
-
-  home-manager.users.kaidong =
-    { pkgs, ... }:
-    let
-      # Get all .nix files recursively, excluding all.nix itself
-      nixFiles = lib.filesystem.listFilesRecursive ./.;
-      moduleFiles = builtins.filter (
-        path: lib.hasSuffix ".nix" (toString path) && (toString path) != (toString ./home.nix)
-      ) nixFiles;
-    in
-    {
-      imports = moduleFiles;
-
       home.stateVersion = "25.11";
-    };
+    }
+    (lib.mkIf standalone {
+      home.username = "kaidong";
+      home.homeDirectory = "${homePath}/kaidong";
+      home.packages = [ pkgs.home-manager ];
+    })
+  ];
 }

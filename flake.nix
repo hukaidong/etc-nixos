@@ -94,7 +94,7 @@
           desktopEnvironment = "i3";
         };
         modules = commonNixModules ++ [
-          ./home/home.nix
+          ./home/nixos-home.nix
           ./hosts/kaidong-main-desktop/configuration.nix
           ./modules/all.nix
         ];
@@ -107,7 +107,7 @@
           desktopEnvironment = "plasma6";
         };
         modules = commonNixModules ++ [
-          ./home/home.nix
+          ./home/nixos-home.nix
           ./hosts/kaidong-main-desktop/configuration.nix
           ./modules/all.nix
         ];
@@ -120,13 +120,13 @@
         modules = commonNixModules ++ [
           nix-index-database.nixosModules.nix-index
 
-          ./home/home.nix
+          ./home/nixos-home.nix
           ./hosts/kaidong-mbp14/configuration.nix
           ./modules/all.nix
         ];
       };
 
-      homeConfigurations."Kaidong-Mac-Studio" =
+      homeConfigurations.Kaidong-Mac-Studio =
         let
           system = "aarch64-darwin";
           pkgs = import nixpkgs {
@@ -137,12 +137,6 @@
             inherit system;
             config.allowUnfree = true;
           };
-          nixFiles = nixpkgs.lib.filesystem.listFilesRecursive ./home;
-          moduleFiles = builtins.filter (
-            path:
-            nixpkgs.lib.hasSuffix ".nix" (toString path)
-            && (toString path) != (toString ./home/home.nix)
-          ) nixFiles;
         in
         inputs.home-manager.lib.homeManagerConfiguration {
           inherit pkgs;
@@ -151,14 +145,10 @@
             inherit (inputs) plover-flake;
             homePath = "/Users";
           };
-          modules = moduleFiles ++ [
+          modules = [
+            (import ./home/home.nix { standalone = true; })
             inputs.plover-flake.homeManagerModules.plover
             inputs.sops-nix.homeManagerModules.sops
-            {
-              home.username = "kaidong";
-              home.homeDirectory = "/Users/kaidong";
-              home.stateVersion = "25.11";
-            }
           ];
         };
 
