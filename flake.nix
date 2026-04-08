@@ -126,6 +126,41 @@
         ];
       };
 
+      homeConfigurations."Kaidong-Mac-Studio" =
+        let
+          system = "aarch64-darwin";
+          pkgs = import nixpkgs {
+            inherit system;
+            config.allowUnfree = true;
+          };
+          pkgs-unstable = import inputs.nixpkgs-unstable {
+            inherit system;
+            config.allowUnfree = true;
+          };
+          nixFiles = nixpkgs.lib.filesystem.listFilesRecursive ./home;
+          moduleFiles = builtins.filter (
+            path:
+            nixpkgs.lib.hasSuffix ".nix" (toString path)
+            && (toString path) != (toString ./home/home.nix)
+          ) nixFiles;
+        in
+        inputs.home-manager.lib.homeManagerConfiguration {
+          inherit pkgs;
+          extraSpecialArgs = {
+            inherit pkgs-unstable;
+            inherit (inputs) plover-flake;
+            homePath = "/Users";
+          };
+          modules = moduleFiles ++ [
+            inputs.plover-flake.homeManagerModules.plover
+            {
+              home.username = "kaidong";
+              home.homeDirectory = "/Users/kaidong";
+              home.stateVersion = "25.11";
+            }
+          ];
+        };
+
       # Virtualization module tests
       checks.x86_64-linux = {
         virtualization-tests = import ./tests/run-tests.nix {
