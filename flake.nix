@@ -153,6 +153,7 @@
           };
           modules = moduleFiles ++ [
             inputs.plover-flake.homeManagerModules.plover
+            inputs.sops-nix.homeManagerModules.sops
             {
               home.username = "kaidong";
               home.homeDirectory = "/Users/kaidong";

@@ -28,9 +28,4 @@
     owner = "root";
   };
 
-  sops.secrets."nix-access-tokens-user" = {
-    key = "nix-access-tokens";
-    mode = "0400";
-    owner = "kaidong";
-  };
 }

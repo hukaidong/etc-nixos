@@ -12,6 +12,7 @@
 
   home-manager.sharedModules = [
     inputs.plover-flake.homeManagerModules.plover
+    inputs.sops-nix.homeManagerModules.sops
   ];
 
   home-manager.extraSpecialArgs =
