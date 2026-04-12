@@ -149,6 +149,7 @@
             (import ./home/home.nix { standalone = true; })
             inputs.plover-flake.homeManagerModules.plover
             inputs.sops-nix.homeManagerModules.sops
+            inputs.nix-index-database.homeModules.default
           ];
         };
 
