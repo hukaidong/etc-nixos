@@ -62,6 +62,7 @@
       user.email = "hukaidonghkd@gmail.com";
       diff.tool = "nvimdiff";
       merge.tool = "nvimdiff";
+      init.defaultBranch = "main";
     };
   };
 }
