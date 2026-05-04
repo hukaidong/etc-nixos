@@ -56,6 +56,9 @@
       # OpenCode
       "AGENTS.md"
 
+      # MacOS
+      ".DS_Store"
+
     ];
     settings = {
       user.name = "Kaidong Hu";
