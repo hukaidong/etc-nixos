@@ -37,6 +37,9 @@ in
           variant = "dvp";
         };
 
+        # Enable 30-bit color (10-bit per channel) for HDR displays
+        defaultDepth = 30;
+
         windowManager.i3 = {
           enable = true;
           extraPackages = with pkgs; [
