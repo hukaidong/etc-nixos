@@ -2,7 +2,12 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, pkgs, desktopEnvironment ? "i3", ... }:
+{
+  config,
+  pkgs,
+  desktopEnvironment ? "i3",
+  ...
+}:
 {
   nixpkgs.config.allowUnfree = true;
 
@@ -37,6 +42,24 @@
         mode = "3360x1440";
         rate = "100.00";
         position = "0x0";
+      };
+    };
+  };
+
+  # Autorandr profile for LG OLED55CC (4K HDR)
+  # TODO: Replace fingerprint after connecting the TV (run: autorandr --fingerprint)
+  services.autorandr.profiles.oled = {
+    fingerprint = {
+      HDMI-1 = "00ffffffffffff001e6dcd84010101010124010380a05a780aee91a3544c99260f5054a1080031404540614071408180d1c00101010108e80030f2705a80b0588a0040846300001e6fc200a0a0a055503020350040846300001a000000fd0018781eff77000a202020202020000000fc004c472054562053534352320a20019b020366f15d616076756665dbda101f04130514030212202122155d5e5f6263643f402c0957071507505707016704076e030c004000b8442c0080010203046dd85dc40178806b432878d33305e200cfe305c000e3060d01e20fffeb0146d000480296885c7695565e00a0a0a029503020350040846300001a0000000000000090";
+    };
+    config = {
+      HDMI-1 = {
+        enable = true;
+        primary = true;
+        mode = "3840x2160";
+        rate = "60.00";
+        position = "0x0";
+        dpi = 96;
       };
     };
   };
