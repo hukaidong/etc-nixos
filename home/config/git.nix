@@ -56,12 +56,16 @@
       # OpenCode
       "AGENTS.md"
 
+      # MacOS
+      ".DS_Store"
+
     ];
     settings = {
       user.name = "Kaidong Hu";
       user.email = "hukaidonghkd@gmail.com";
       diff.tool = "nvimdiff";
       merge.tool = "nvimdiff";
+      init.defaultBranch = "main";
     };
   };
 }
