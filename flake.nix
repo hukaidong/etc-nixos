@@ -7,7 +7,7 @@
     nixpkgs-ruby.url = "github:bobvanderlinden/nixpkgs-ruby";
     nix-ai-tools.url = "github:numtide/nix-ai-tools";
     fakwin.url = "github:DMaroo/fakwin";
-    home-manager.url = "github:nix-community/home-manager/release-25.11";
+    home-manager.url = "github:nix-community/home-manager/release-26.05";
     nix-index-database.url = "github:nix-community/nix-index-database";
     plover-flake.url = "github:openstenoproject/plover-flake";
     sops-nix.url = "github:Mic92/sops-nix";
