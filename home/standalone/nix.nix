@@ -5,7 +5,7 @@
     sops
     nvd
     nixd
-    nixfmt-rfc-style
+    nixfmt
     devenv
   ];
 

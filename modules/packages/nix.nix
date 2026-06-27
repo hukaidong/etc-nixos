@@ -7,7 +7,7 @@
     comma
     nvd
     nixd
-    nixfmt-rfc-style
+    nixfmt
     nix-index
   ];
 }

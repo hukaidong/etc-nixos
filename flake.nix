@@ -48,6 +48,16 @@
                 docSupport = true;
               };
               myfonts = inputs.fontconfig.packages.${system}.default;
+
+              # Workaround: pipx 1.8.0's test suite hardcodes the pre-spacing
+              # package-specifier format (`black@ url`) while the newer `packaging`
+              # lib in nixos-26.05 canonicalises with a space (`black @ url`), so
+              # 7 checkPhase tests fail. Hydra fails the same way (output is not
+              # in cache.nixos.org). The package itself is fine; skip its tests.
+              # TODO: drop once nixpkgs ships a fixed pipx for 26.05.
+              pipx = prev.pipx.overridePythonAttrs (_: {
+                doCheck = false;
+              });
             }
           )
         ];
