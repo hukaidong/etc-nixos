@@ -82,17 +82,64 @@
           git commit -am "chore: Update flake.lock"
           git push
         '';
+      # Sweeps the probes in ./upstream-checks and reports which upstream
+      # workarounds can now be dropped. Scripts stay editable in-repo (not baked
+      # into the store) so they are located relative to the git work tree.
+      mkUpstreamCheck =
+        pkgs:
+        pkgs.writeShellApplication {
+          name = "upstream-check";
+          runtimeInputs = with pkgs; [
+            jq
+            git
+          ];
+          text = ''
+            root="$(git rev-parse --show-toplevel)"
+            dir="$root/upstream-checks"
+            shopt -s nullglob
+            scripts=( "$dir"/*.sh )
+            if [ ''${#scripts[@]} -eq 0 ]; then
+              echo "No upstream checks found in $dir"
+              exit 0
+            fi
+            echo "Sweeping ''${#scripts[@]} upstream check(s)..."
+            echo
+            clear_list=()
+            for s in "''${scripts[@]}"; do
+              rc=0
+              bash "$s" || rc=$?
+              case "$rc" in
+                1) clear_list+=( "$(basename "$s" .sh)" ) ;;
+                2) echo "   (probe error in $(basename "$s"))" ;;
+              esac
+              echo
+            done
+            echo "================ summary ================"
+            if [ ''${#clear_list[@]} -eq 0 ]; then
+              echo "All workarounds still required; no upstream path cleared yet."
+            else
+              echo "Upstream path CLEAR for: ''${clear_list[*]}"
+              echo "  -> remove the matching workaround and its check script."
+            fi
+          '';
+        };
     in
     {
       devShells.x86_64-linux.default =
         let
           pkgs = nixpkgs.legacyPackages.x86_64-linux;
           update-command = mkUpdateCommand pkgs;
+          upstream-check-command = mkUpstreamCheck pkgs;
         in
         pkgs.mkShell {
-          packages = [ update-command ];
+          packages = [
+            update-command
+            upstream-check-command
+          ];
           shellHook = ''
-            echo "NixOS config shell loaded. Run 'update' to update flake.lock and push."
+            echo "NixOS config shell loaded."
+            echo "  update          - update flake.lock and push"
+            echo "  upstream-check  - probe upstream fixes for carried workarounds"
           '';
         };
 

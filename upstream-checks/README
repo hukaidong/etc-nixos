@@ -1,0 +1,47 @@
+Upstream checks
+===============
+
+This folder tracks workarounds we carry for upstream bugs (broken package
+builds, stale tests, regressions) and gives each one a script that probes
+whether upstream has fixed the problem yet.  When a probe reports that the
+upstream path is clear, the matching workaround in our configuration can be
+removed.
+
+Run the whole sweep from the dev shell:
+
+    upstream-check
+
+This iterates every check script in this folder, runs its probe, and prints a
+summary listing which workarounds can now be dropped.
+
+Each check is a single executable shell script (`*.sh`) in this folder.  The
+runner treats the script's exit code as the verdict:
+
+    0   workaround still required (upstream still broken)
+    1   upstream path clear -> the workaround can be dropped
+    2   inconclusive / probe error
+
+A script should print a short, human-readable explanation of what it probed and
+what to do, then exit with one of those codes.  Scripts may assume `git`, `jq`
+and `nix` are on PATH (the dev shell provides them) and that the working tree is
+the repository root, which they can locate with `git rev-parse --show-toplevel`.
+
+Adding a new check
+------------------
+
+When you add a workaround somewhere in the configuration, drop a sibling script
+here named after the package, e.g. `foo.sh`.  Probe the real thing the
+workaround exists to dodge -- usually "does upstream build with its tests
+enabled" -- and report the verdict via the exit codes above.  No registration
+is needed; the runner picks up every `*.sh` automatically.
+
+Current checks
+--------------
+
+pipx.sh
+    pipx 1.8.0's test suite hardcodes the pre-spacing package-specifier format
+    while the newer `packaging` library in nixos-26.05 canonicalises with a
+    space, so its checkPhase fails (Hydra fails identically, so it is not in the
+    binary cache).  Workaround: the flake.nix overlay sets `doCheck = false` on
+    pipx.  The probe builds pipx with tests enabled at the pinned nixpkgs rev
+    and on the live nixos-26.05 branch.
