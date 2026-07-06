@@ -210,12 +210,19 @@
           ];
         };
 
-      # Virtualization module tests
-      checks.x86_64-linux = {
-        virtualization-tests = import ./tests/run-tests.nix {
-          inherit inputs;
+      # VM-based module tests
+      checks.x86_64-linux =
+        let
           pkgs = nixpkgs.legacyPackages.x86_64-linux;
+          inherit (pkgs) lib;
+        in
+        {
+          virtualisation-test = pkgs.testers.nixosTest (
+            import ./tests/modules/virtualisation-test.nix { inherit pkgs lib; }
+          );
+          virt-manager-test = pkgs.testers.nixosTest (
+            import ./tests/modules/virt-manager-test.nix { inherit pkgs lib; }
+          );
         };
-      };
     };
 }

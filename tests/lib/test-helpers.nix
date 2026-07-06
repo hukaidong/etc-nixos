@@ -14,10 +14,7 @@ in
       ...
     }:
     {
-      imports = [
-        ../modules/all.nix
-      ]
-      ++ extraModules;
+      imports = extraModules;
 
       # Minimal base configuration for testing
       users.users.kaidong = {

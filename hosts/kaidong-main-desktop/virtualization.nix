@@ -5,13 +5,6 @@
   kaidong-desktop.virtualization = {
     docker.enable = true;
 
-    kubernetes.enable = true;
-
-    k3s = {
-      enable = true;
-      isServer = true;
-    };
-
     podman.enable = true;
 
     devcontainer.enable = true;

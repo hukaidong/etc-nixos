@@ -11,11 +11,10 @@ in
     all-enabled =
       { config, pkgs, ... }:
       testHelpers.mkTestMachine {
-        extraModules = [ ../modules/services/virtualisation.nix ];
+        extraModules = [ ../../modules/services/virtualisation.nix ];
         extraConfig = {
           kaidong-desktop.virtualization = {
             docker.enable = true;
-            kubernetes.enable = true;
             podman.enable = true;
             devcontainer.enable = true;
             podmanCompose.enable = true;
@@ -27,11 +26,10 @@ in
     docker-only =
       { config, pkgs, ... }:
       testHelpers.mkTestMachine {
-        extraModules = [ ../modules/services/virtualisation.nix ];
+        extraModules = [ ../../modules/services/virtualisation.nix ];
         extraConfig = {
           kaidong-desktop.virtualization = {
             docker.enable = true;
-            kubernetes.enable = false;
             podman.enable = false;
             devcontainer.enable = false;
             podmanCompose.enable = false;
@@ -43,11 +41,10 @@ in
     podman-only =
       { config, pkgs, ... }:
       testHelpers.mkTestMachine {
-        extraModules = [ ../modules/services/virtualisation.nix ];
+        extraModules = [ ../../modules/services/virtualisation.nix ];
         extraConfig = {
           kaidong-desktop.virtualization = {
             docker.enable = false;
-            kubernetes.enable = false;
             podman.enable = true;
             devcontainer.enable = false;
             podmanCompose.enable = false;
@@ -59,11 +56,10 @@ in
     all-disabled =
       { config, pkgs, ... }:
       testHelpers.mkTestMachine {
-        extraModules = [ ../modules/services/virtualisation.nix ];
+        extraModules = [ ../../modules/services/virtualisation.nix ];
         extraConfig = {
           kaidong-desktop.virtualization = {
             docker.enable = false;
-            kubernetes.enable = false;
             podman.enable = false;
             devcontainer.enable = false;
             podmanCompose.enable = false;
@@ -86,10 +82,6 @@ in
       # Check Podman
       all_enabled.succeed("command -v podman")
 
-      # Check Kubernetes packages
-      all_enabled.succeed("command -v kubectl")
-      all_enabled.succeed("command -v helm")
-
       # Check DevContainer
       all_enabled.succeed("command -v devcontainer")
 
@@ -105,7 +97,6 @@ in
 
       # Verify other components are not installed
       docker_only.fail("command -v podman")
-      docker_only.fail("command -v kubectl")
       docker_only.fail("command -v devcontainer")
       docker_only.fail("command -v podman-compose")
 
@@ -117,7 +108,6 @@ in
       # Verify other components are not installed
       podman_only.fail("systemctl is-active docker")
       podman_only.fail("command -v docker")
-      podman_only.fail("command -v kubectl")
       podman_only.fail("command -v devcontainer")
       podman_only.fail("command -v podman-compose")
 
@@ -128,8 +118,6 @@ in
       all_disabled.fail("systemctl is-active docker")
       all_disabled.fail("command -v docker")
       all_disabled.fail("command -v podman")
-      all_disabled.fail("command -v kubectl")
-      all_disabled.fail("command -v helm")
       all_disabled.fail("command -v devcontainer")
       all_disabled.fail("command -v podman-compose")
     '';
