@@ -11,7 +11,7 @@ in
     virt-manager-enabled =
       { config, pkgs, ... }:
       testHelpers.mkTestMachine {
-        extraModules = [ ../../modules/services/virt-manager.nix ];
+        extraModules = [ ../../modules/virtualization/virt-manager.nix ];
         extraConfig = {
           kaidong-desktop.virtualization.virtManager.enable = true;
         };
@@ -21,7 +21,7 @@ in
     virt-manager-disabled =
       { config, pkgs, ... }:
       testHelpers.mkTestMachine {
-        extraModules = [ ../../modules/services/virt-manager.nix ];
+        extraModules = [ ../../modules/virtualization/virt-manager.nix ];
         extraConfig = {
           kaidong-desktop.virtualization.virtManager.enable = false;
         };

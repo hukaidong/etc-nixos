@@ -11,7 +11,7 @@ in
     all-enabled =
       { config, pkgs, ... }:
       testHelpers.mkTestMachine {
-        extraModules = [ ../../modules/services/virtualisation.nix ];
+        extraModules = [ ../../modules/virtualization/virtualisation.nix ];
         extraConfig = {
           kaidong-desktop.virtualization = {
             docker.enable = true;
@@ -26,7 +26,7 @@ in
     docker-only =
       { config, pkgs, ... }:
       testHelpers.mkTestMachine {
-        extraModules = [ ../../modules/services/virtualisation.nix ];
+        extraModules = [ ../../modules/virtualization/virtualisation.nix ];
         extraConfig = {
           kaidong-desktop.virtualization = {
             docker.enable = true;
@@ -41,7 +41,7 @@ in
     podman-only =
       { config, pkgs, ... }:
       testHelpers.mkTestMachine {
-        extraModules = [ ../../modules/services/virtualisation.nix ];
+        extraModules = [ ../../modules/virtualization/virtualisation.nix ];
         extraConfig = {
           kaidong-desktop.virtualization = {
             docker.enable = false;
@@ -56,7 +56,7 @@ in
     all-disabled =
       { config, pkgs, ... }:
       testHelpers.mkTestMachine {
-        extraModules = [ ../../modules/services/virtualisation.nix ];
+        extraModules = [ ../../modules/virtualization/virtualisation.nix ];
         extraConfig = {
           kaidong-desktop.virtualization = {
             docker.enable = false;
