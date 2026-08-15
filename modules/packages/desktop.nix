@@ -18,6 +18,7 @@
     # ai-tools.codex
     ai-tools.opencode
     ai-tools.claude-code
+    ai-tools.dsh
 
     # required by opencode
     bun
