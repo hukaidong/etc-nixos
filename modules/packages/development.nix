@@ -22,5 +22,8 @@
 
     rlwrap
     sqlite
+
+    # Node package manager; used by `dsh plugin --profile <name> add ...`
+    pnpm
   ];
 }
