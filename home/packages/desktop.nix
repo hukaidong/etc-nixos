@@ -7,7 +7,7 @@
 {
   options.modules.desktop.enable = lib.mkOption {
     type = lib.types.bool;
-    default = pkgs.stdenv.isLinux;
+    default = pkgs.stdenv.hostPlatform.isLinux;
     description = "Whether to enable desktop packages";
   };
 
