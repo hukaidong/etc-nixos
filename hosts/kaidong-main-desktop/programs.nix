@@ -10,6 +10,7 @@ with pkgs;
   kaidong-desktop.services = {
     davMail.enable = true;
     davMail-backup.enable = true;
+    dshWeb.enable = true;
   };
 
   services.ollama.enable = true;
