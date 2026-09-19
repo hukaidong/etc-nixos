@@ -35,13 +35,23 @@ workaround exists to dodge -- usually "does upstream build with its tests
 enabled" -- and report the verdict via the exit codes above.  No registration
 is needed; the runner picks up every `*.sh` automatically.
 
+`example.sh.template` is a commented stub covering the contract and the common
+probe shapes.  Copy it, do not run it in place:
+
+    cp example.sh.template <package>.sh && chmod +x <package>.sh
+
 Current checks
 --------------
 
-pipx.sh
-    pipx 1.8.0's test suite hardcodes the pre-spacing package-specifier format
-    while the newer `packaging` library in nixos-26.05 canonicalises with a
-    space, so its checkPhase fails (Hydra fails identically, so it is not in the
-    binary cache).  Workaround: the flake.nix overlay sets `doCheck = false` on
-    pipx.  The probe builds pipx with tests enabled at the pinned nixpkgs rev
-    and on the live nixos-26.05 branch.
+None.  Recent workarounds are version-gated directly in the configuration
+instead, so they self-report and need no probe here:
+
+    pipx (flake.nix, extraPkgsOverlay)
+        Deselects test_fix_package_name + test_parse_specifier_for_metadata
+        while pipx < 1.16 to dodge the packaging-26 direct-reference spacing
+        change (pypa/packaging#953).  nixpkgs fixed it by moving to pipx >= 1.16
+        (NixOS/nixpkgs#536749, not backported to 26.05 as of #522307).  At or
+        above 1.16 the overlay emits a warning asking for the gate to be removed.
+
+    Add a probe here when a workaround is *not* version-gated and only a real
+    build can tell whether upstream is fixed.

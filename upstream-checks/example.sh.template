@@ -1,0 +1,69 @@
+#!/usr/bin/env bash
+#
+# =============================================================================
+# TEMPLATE upstream check -- copy me, do not run me directly.
+# =============================================================================
+#
+# `upstream-check` (the mkUpstreamCheck runner in ../flake.nix) sweeps every
+# `*.sh` file in this directory, so this template deliberately ends in
+# `.template` and is ignored until you copy it:
+#
+#     cp example.sh.template <package>.sh && chmod +x <package>.sh
+#
+# Each check answers one question: "has upstream fixed the bug our workaround
+# exists to dodge?".  The runner reads only the exit code:
+#
+#     0   workaround still required (upstream still broken)
+#     1   upstream path CLEAR -> drop the workaround, then delete this script
+#     2   inconclusive / probe error (missing tool, bad data, network, ...)
+#
+# Conventions:
+#   * bash, executable, starting with `#!/usr/bin/env bash`;
+#   * print a short explanation of what was probed and what to do next;
+#   * assume `git`, `jq` and `nix` are on PATH (the dev shell provides them);
+#   * find the repo root with `git rev-parse --show-toplevel`;
+#   * probe the *real* thing the workaround dodges, e.g. "does upstream build
+#     with its tests enabled" -- usually the exit status of `nix build`.
+#
+# `set -e` is intentionally NOT used: a probe that dies should report 2, not
+# inherit some failing command's status by accident.
+set -uo pipefail
+
+pkg="example" # <-- the package whose workaround you are tracking
+repo="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+
+echo "## $pkg"
+echo "   workaround: <file>:<what it does and why it exists>"
+
+# --- 1. environment sanity ---------------------------------------------------
+if ! command -v nix >/dev/null 2>&1; then
+  echo "   => inconclusive: nix is not on PATH"
+  exit 2
+fi
+
+# --- 2. the probe ------------------------------------------------------------
+# Probe the thing the workaround hides.  Common shapes:
+#
+#   pinned rev from flake.lock:
+#     node="$(jq -r '.nodes.root.inputs.nixpkgs' "$repo/flake.lock")"
+#     rev="$(jq -r --arg k "$node" '.nodes[$k].locked.rev' "$repo/flake.lock")"
+#     nix build --no-link "github:NixOS/nixpkgs/$rev#$pkg"
+#
+#   live branch:
+#     nix build --no-link "github:NixOS/nixpkgs/nixos-26.05#$pkg"
+#
+#   plain nixpkgs (as below):
+if nix build --no-link "github:NixOS/nixpkgs/nixos-26.05#$pkg" >/dev/null 2>&1; then
+  upstream_ok=1
+else
+  upstream_ok=0
+fi
+
+# --- 3. verdict --------------------------------------------------------------
+if [ "$upstream_ok" -eq 1 ]; then
+  echo "   => CLEAR: upstream $pkg builds; remove the workaround in <file>."
+  exit 1
+fi
+
+echo "   => still needed: upstream $pkg still fails."
+exit 0
