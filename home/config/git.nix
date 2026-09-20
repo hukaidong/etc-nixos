@@ -66,6 +66,7 @@
       diff.tool = "nvimdiff";
       merge.tool = "nvimdiff";
       init.defaultBranch = "main";
+      push.autoSetupRemote = true;
     };
   };
 }

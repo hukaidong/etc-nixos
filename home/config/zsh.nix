@@ -47,7 +47,7 @@
     gd = "git diff";
     gdd = "git diff --cached";
     gl = "git log --oneline --graph --decorate";
-    gca = "git commit --amend";
+    gca = "git commit --verbose --all";
     groot = "git status >/dev/null && cd $(git rev-parse --show-toplevel)";
   };
 }

@@ -1,4 +1,9 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 let
   cfg = config.kaidong-desktop.desktopEnvironment.plasma6;
 in
@@ -20,5 +25,9 @@ in
     environment.sessionVariables = {
       NIXOS_OZONE_WL = "1";
     };
+
+    environment.systemPackages = with pkgs; [
+      aha # Required by Info Center
+    ];
   };
 }
