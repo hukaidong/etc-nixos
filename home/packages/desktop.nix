@@ -14,13 +14,18 @@
   config = lib.mkIf config.modules.desktop.enable {
     home.packages = with pkgs; [
       # Productivity applications
-      anki
       keepassxc
       zotero
       zathura
       thunderbird
       discord
       gimp3
+      libreoffice
+
+      # Creative and engineering applications
+      blender
+      freecad
+      kicad
     ];
   };
 }
