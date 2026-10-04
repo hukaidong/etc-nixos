@@ -43,8 +43,20 @@ probe shapes.  Copy it, do not run it in place:
 Current checks
 --------------
 
-None.  Recent workarounds are version-gated directly in the configuration
-instead, so they self-report and need no probe here:
+    dsh.sh
+        nixpkgs builds nodejs with `zerocallusedregs` hardening, which breaks
+        the `node-addon-require-builtin` addon that `@deepseek-ai/dsh-app-boot`
+        uses to reach Node internals; every profile mount dies in
+        installRuntimeInterception() and `dsh` cannot start
+        (numtide/llm-agents.nix#9994, NixOS/nixpkgs#565667).  The workaround is
+        commit d902a1b ("fix(dsh): patch node-addon-require-builtin boot
+        failure"): a `dsh-patched` override in flake.nix, wired in through
+        modules/packages/desktop.nix and modules/services/dsh.nix.  The probe
+        builds unpatched `dsh` from nix-ai-tools HEAD and really boots the web
+        profile; it clears once a flake.lock update would let us drop the
+        override.
+
+    Version-gated workarounds self-report and need no probe here:
 
     pipx (flake.nix, extraPkgsOverlay)
         Deselects test_fix_package_name + test_parse_specifier_for_metadata
