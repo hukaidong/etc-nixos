@@ -42,6 +42,29 @@
                 config.allowUnfree = true;
               };
               ai-tools = inputs.nix-ai-tools.packages.${system};
+              # WORKAROUND -- remove once upstream is fixed
+              # (probe: upstream-checks/dsh.sh).  nixpkgs builds nodejs with
+              # `zerocallusedregs` hardening, which breaks the
+              # `node-addon-require-builtin` native addon that
+              # `@deepseek-ai/dsh-app-boot` uses to reach Node internals.
+              # Mounting any dsh profile then aborts in
+              # installRuntimeInterception() with `Unsupported/no-getter`, so
+              # `dsh` cannot start at all.
+              #   https://github.com/numtide/llm-agents.nix/issues/9994
+              #   https://github.com/NixOS/nixpkgs/issues/565667
+              # The override rewrites the one offending call in
+              # dsh-app-boot/lib/index.js to a plain `createRequire` (the
+              # launcher already runs node with --expose-internals).  Call sites:
+              # modules/packages/desktop.nix, modules/services/dsh.nix.
+              dsh-patched = inputs.nix-ai-tools.packages.${system}.dsh.overrideAttrs (old: {
+                postInstall = (old.postInstall or "") + ''
+                        substituteInPlace \
+                          $out/lib/node_modules/@deepseek-ai/dsh/node_modules/@deepseek-ai/dsh-app-boot/lib/index.js \
+                          --replace-fail \
+                        'createRequire(import.meta.url)("node-addon-require-builtin")' \
+                  '{ requireBuiltin: createRequire(import.meta.url) }'
+                '';
+              });
 
               # Custom packages
               ruby-custom = (inputs.nixpkgs-ruby.packages.${system}."ruby-4.0.0").override {

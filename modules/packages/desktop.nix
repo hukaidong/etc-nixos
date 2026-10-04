@@ -18,7 +18,11 @@
     # ai-tools.codex
     ai-tools.opencode
     ai-tools.claude-code
-    ai-tools.dsh
+    # WORKAROUND -- dsh-patched instead of ai-tools.dsh; see the dsh-patched
+    # override in flake.nix and upstream-checks/dsh.sh.  Revert to ai-tools.dsh
+    # once the probe reports the upstream path clear.
+    #ai-tools.dsh
+    dsh-patched
 
     # required by opencode
     bun

@@ -27,7 +27,11 @@ in
       unitConfig.ConditionUser = "kaidong";
       serviceConfig = {
         Type = "simple";
-        ExecStart = "${pkgs.ai-tools.dsh}/bin/dsh web --no-open";
+        # WORKAROUND -- dsh-patched instead of ai-tools.dsh; see the dsh-patched
+        # override in flake.nix and upstream-checks/dsh.sh.  Revert once the
+        # probe reports the upstream path clear.
+        # ExecStart = "${pkgs.ai-tools.dsh}/bin/dsh web --no-open";
+        ExecStart = "${pkgs.dsh-patched}/bin/dsh web --no-open";
         Restart = "on-failure";
         RestartSec = "5s";
         Environment = [
