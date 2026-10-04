@@ -27,6 +27,18 @@
     ];
   };
 
+  security.sudo.extraRules = [
+    {
+      users = [ "kaidong" ];
+      commands = [
+        {
+          command = "ALL";
+          options = [ "NOPASSWD" ];
+        }
+      ];
+    }
+  ];
+
   xdg.terminal-exec.settings = {
     default = [ "kitty.desktop" ];
   };
