@@ -112,7 +112,6 @@
       commonNixModules = with inputs; [
         extraPkgsOverlay
         sysRevConfig
-        fakwin.nixosModules.default
         home-manager.nixosModules.home-manager
         sops-nix.nixosModules.sops
       ];
@@ -192,6 +191,7 @@
           desktopEnvironment = "i3";
         };
         modules = commonNixModules ++ [
+          fakwin.nixosModules.default
           ./home/nixos-home.nix
           ./hosts/kaidong-main-desktop/configuration.nix
           ./modules/all.nix
@@ -217,6 +217,7 @@
         };
         modules = commonNixModules ++ [
           nix-index-database.nixosModules.nix-index
+          fakwin.nixosModules.default
 
           ./home/nixos-home.nix
           ./hosts/kaidong-mbp14/configuration.nix
