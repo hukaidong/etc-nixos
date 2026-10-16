@@ -26,6 +26,7 @@
       blender
       freecad
       kicad
+      bambu-studio
     ];
   };
 }
