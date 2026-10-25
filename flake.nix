@@ -12,6 +12,11 @@
     plover-flake.url = "github:openstenoproject/plover-flake";
     sops-nix.url = "github:Mic92/sops-nix";
     fontconfig.url = "github:hukaidong/flake-fonts";
+    # KDE/Qt 6 front end for LapwingTools.  Do not make its nixpkgs follow
+    # ours: the app and the lapwingtools-rs engine it links must be built
+    # against the one nixpkgs revision the engine pins, or glibc symbols do
+    # not line up (see lapwingqt/default.nix).
+    lapwingqt.url = "github:hukaidong/lapwingqt";
 
     nix-index-database.inputs.nixpkgs.follows = "nixpkgs";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
@@ -48,6 +53,7 @@
                 docSupport = true;
               };
               myfonts = inputs.fontconfig.packages.${system}.default;
+              lapwing-qt = inputs.lapwingqt.packages.${system}.default;
 
               # Workaround (gated: pipx < 1.16).  pipx 1.8.0's test suite
               # hardcodes the pre-spacing package-specifier format (`black@ url`)

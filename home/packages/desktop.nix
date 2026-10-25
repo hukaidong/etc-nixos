@@ -21,6 +21,7 @@
       discord
       gimp3
       libreoffice
+      lapwing-qt
 
       # Creative and engineering applications
       blender
