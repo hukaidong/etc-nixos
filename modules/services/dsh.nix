@@ -6,6 +6,15 @@
 }:
 let
   cfg = config.kaidong-desktop.services.dshWeb;
+
+  # dsh is an agent: it needs the user's whole toolchain on PATH, not just
+  # what the unit declares.  Prepend the Home Manager profile (all
+  # `home.packages`) to the PATH the unit already receives.  This is the
+  # same pattern Home Manager uses for its opencode-web service.
+  dshWebLauncher = pkgs.writeShellScriptBin "dsh-web-launcher" ''
+    export PATH="${config.home-manager.users.kaidong.home.profileDirectory}/bin''${PATH:+:$PATH}"
+    exec ${pkgs.ai-tools.dsh}/bin/dsh web --no-open
+  '';
 in
 {
   options.kaidong-desktop.services.dshWeb = {
@@ -27,11 +36,9 @@ in
       unitConfig.ConditionUser = "kaidong";
       serviceConfig = {
         Type = "simple";
-        # WORKAROUND -- dsh-patched instead of ai-tools.dsh; see the dsh-patched
-        # override in flake.nix and upstream-checks/dsh.sh.  Revert once the
-        # probe reports the upstream path clear.
-        # ExecStart = "${pkgs.ai-tools.dsh}/bin/dsh web --no-open";
-        ExecStart = "${pkgs.dsh-patched}/bin/dsh web --no-open";
+        # dshWebLauncher prepends the Home Manager profile to this PATH; see
+        # `home-manager.useUserPackages` in home/nixos-home.nix.
+        ExecStart = lib.getExe dshWebLauncher;
         Restart = "on-failure";
         RestartSec = "5s";
         Environment = [
