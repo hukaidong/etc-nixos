@@ -5,6 +5,7 @@
     age
     sops
     comma
+    nh
     nvd
     nixd
     nixfmt

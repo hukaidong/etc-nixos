@@ -3,6 +3,7 @@
   home.packages = with pkgs; [
     age
     sops
+    nh
     nvd
     nixd
     nixfmt

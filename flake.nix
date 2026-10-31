@@ -12,11 +12,7 @@
     plover-flake.url = "github:openstenoproject/plover-flake";
     sops-nix.url = "github:Mic92/sops-nix";
     fontconfig.url = "github:hukaidong/flake-fonts";
-    # KDE/Qt 6 front end for LapwingTools.  Do not make its nixpkgs follow
-    # ours: the app and the lapwingtools-rs engine it links must be built
-    # against the one nixpkgs revision the engine pins, or glibc symbols do
-    # not line up (see lapwingqt/default.nix).
-    lapwingqt.url = "github:hukaidong/lapwingqt";
+    lapwingqt.url = "github:kd-lapwings/lapwingqt";
 
     nix-index-database.inputs.nixpkgs.follows = "nixpkgs";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
