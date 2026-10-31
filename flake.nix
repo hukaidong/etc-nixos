@@ -58,35 +58,6 @@
               myfonts = inputs.fontconfig.packages.${system}.default;
               lapwing-qt = inputs.lapwingqt.packages.${system}.default;
 
-              # Workaround (gated: pipx < 1.16).  pipx 1.8.0's test suite
-              # hardcodes the pre-spacing package-specifier format (`black@ url`)
-              # while `packaging` 26 in nixos-26.05 serialises direct references
-              # with a space (`black @ url`, pypa/packaging#953).  7 checkPhase
-              # cases in test_fix_package_name / test_parse_specifier_for_metadata
-              # fail; Hydra fails identically, so the output is not in
-              # cache.nixos.org.  The package itself is fine (both spellings are
-              # valid PEP 508), so deselect just those two tests and keep the
-              # rest of the suite running.
-              #
-              # nixpkgs fixed this by moving to pipx >= 1.16 (NixOS/nixpkgs#536749,
-              # not backported to 26.05 as of #522307).  Any version at or above
-              # that line gets no override; instead it warns so we remember to
-              # delete this gate once the pinned nixpkgs catches up.
-              pipx =
-                if prev.lib.versionOlder prev.pipx.version "1.16" then
-                  prev.pipx.overridePythonAttrs (old: {
-                    disabledTests = (old.disabledTests or [ ]) ++ [
-                      "test_fix_package_name"
-                      "test_parse_specifier_for_metadata"
-                    ];
-                  })
-                else
-                  prev.lib.warn ''
-                    pipx ${prev.pipx.version} is at or above the 1.16 fix line, so
-                    the packaging-26 test workaround in flake.nix is obsolete.
-                    Please remove the pipx gate in extraPkgsOverlay and add an
-                    upstream check (see upstream-checks/) if one is still needed.'' prev.pipx;
-
               # Workaround (gated: fpdf2 < 2.9.0 + Pillow 13.x).  fpdf2 2.8.9's
               # test_image_with_explicit_dimensions compares its output against
               # test/image/image_with_explicit_dimensions.pdf, a reference

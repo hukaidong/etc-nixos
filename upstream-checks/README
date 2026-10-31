@@ -56,15 +56,6 @@ Current checks
         unpatched; it clears once the pin ships 2.9.0, deselects the test, or the
         suite passes again.
 
-    Version-gated workarounds that need no probe here:
-
-    pipx (flake.nix, extraPkgsOverlay)
-        Deselects test_fix_package_name + test_parse_specifier_for_metadata
-        while pipx < 1.16 to dodge the packaging-26 direct-reference spacing
-        change (pypa/packaging#953).  nixpkgs fixed it by moving to pipx >= 1.16
-        (NixOS/nixpkgs#536749, not backported to 26.05 as of #522307).  At or
-        above 1.16 the overlay emits a warning asking for the gate to be removed.
-
     Add a probe here when a version gate cannot see every way the workaround
     becomes unnecessary (as with fpdf2), or when only a real build can tell
     whether upstream is fixed.
