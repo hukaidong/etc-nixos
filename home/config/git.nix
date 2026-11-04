@@ -11,7 +11,8 @@
   programs.git = {
     enable = true;
     attributes = [
-      "*.lock binary"
+      "yarn.lock binary"
+      "package-lock.json binary"
       "gemset.nix binary"
     ];
     ignores = [
