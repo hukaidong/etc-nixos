@@ -1,5 +1,6 @@
 {
   config,
+  inputs,
   lib,
   pkgs,
   ...
@@ -17,24 +18,233 @@ let
   colimaHome = "${stateDir}/colima";
   install = "${pkgs.coreutils}/bin/install";
 
-  isAarch64 = pkgs.stdenv.hostPlatform.isAarch64;
+  # aarch64 or x86_64: the VM, the image and the runner's architecture label
+  # all follow this Mac's CPU.
+  cpu = pkgs.stdenv.hostPlatform.parsed.cpu.name;
 
   dockerEnv = {
     HOME = stateDir;
     DOCKER_CONFIG = "${stateDir}/docker";
   };
 
-  # Image and launcher sources (see the comments in each file).
-  dockerfile = ../../configs/github-runner-linux/Dockerfile;
-  # Both runners run the same release: nixpkgs' github-runner here, the
-  # matching ghcr.io/actions/actions-runner tag in the image.
-  runnerVersion = pkgs.github-runner.version;
-  # The image installs the Nix release the host daemon runs, without nixpkgs'
-  # patch suffix ("2.34.9+1" -> "2.34.9").
-  nixVersion = lib.head (lib.splitString "+" config.nix.package.version);
-  imageTag = builtins.substring 0 12 (
-    builtins.hashString "sha256" (builtins.readFile dockerfile + runnerVersion + nixVersion)
+  # --- The runner image ------------------------------------------------------
+  #
+  # Built by Nix and pinned by flake.lock, like the rest of this machine. This
+  # Mac has no Linux builder, so the image only uses Linux packages that
+  # cache.nixos.org has, and everything else is platform-independent glue
+  # built here: symlinks, text files, the image's top layer and the script
+  # that streams the image.
+
+  # Plain nixpkgs, without this flake's overlays or config, so every Linux
+  # store path is one Hydra built.
+  linuxPkgs = inputs.nixpkgs.legacyPackages."${cpu}-linux";
+
+  # Programs on the jobs' PATH: what the org's workflows (lapwingtools-rs
+  # native-platforms.yml, nix.yml, bump-version.yml) expect of a Linux runner,
+  # plus the usual shell tools. gcc's wrapper includes binutils (nm, ld, ar).
+  tools = map lib.getBin (
+    with linuxPkgs;
+    [
+      bashInteractive
+      coreutils
+      findutils
+      diffutils
+      gnugrep
+      gnused
+      gawk
+      gnupatch
+      which
+      procps
+      gnutar
+      gzip
+      bzip2
+      xz
+      zstd
+      unzip
+      curl
+      git
+      jq
+      gcc
+      gnumake
+      pkg-config
+      sqlite
+      rustup
+      nix
+    ]
   );
+  sqliteDev = lib.getDev linuxPkgs.sqlite;
+  home = "/root";
+  runnerRoot = "/runner";
+
+  # Registers an ephemeral runner and runs it for one job; see the file. The
+  # shebang and the store paths are Linux ones, but the file is plain text,
+  # so it is written (and shellchecked) here.
+  entrypoint = pkgs.writeTextFile {
+    name = "github-runner-linux-entrypoint";
+    executable = true;
+    text = ''
+      #!${linuxPkgs.runtimeShell}
+      set -o errexit -o nounset -o pipefail
+      GITHUB_RUNNER=${linuxPkgs.github-runner}
+    ''
+    + builtins.readFile ../../configs/github-runner-linux/entrypoint.sh;
+    checkPhase = ''
+      ${pkgs.stdenv.shellDryRun} "$target"
+      ${lib.getExe pkgs.shellcheck-minimal} "$target"
+    '';
+  };
+
+  # The image's root file system, as symlinks into the Linux store paths. Its
+  # closure is everything the image uses, so includeNixDB below registers all
+  # of it in the image's Nix database: Nix in a job then substitutes nothing
+  # the image has, and its garbage collector (a cache volume can keep /nix)
+  # never deletes the runner or its tools.
+  rootfs = pkgs.runCommandLocal "github-runner-linux-rootfs" { } ''
+    shopt -s nullglob
+    mkdir -p $out/usr/bin $out/usr/include $out/usr/lib/pkgconfig \
+      $out/usr/libexec/github-runner $out/etc/ssl/certs
+
+    # Of two programs with the same name, the earlier package's wins
+    # (coreutils' kill and uptime over procps').
+    for pkg in ${lib.escapeShellArgs tools}; do
+      for program in "$pkg"/bin/*; do
+        name=''${program##*/}
+        if [[ ! -e $out/usr/bin/$name && ! -L $out/usr/bin/$name ]]; then
+          ln -s "$program" "$out/usr/bin/$name"
+        fi
+      done
+    done
+
+    # SQLite's development files where Debian's libsqlite3-dev puts them,
+    # for pkg-config (PKG_CONFIG_PATH) and the compiler (CPATH).
+    ln -s ${sqliteDev}/include/* $out/usr/include/
+    ln -s ${sqliteDev}/lib/pkgconfig/sqlite3.pc $out/usr/lib/pkgconfig/
+
+    # CA certificates at the paths Nix, Debian and OpenSSL look at.
+    ln -s ${linuxPkgs.cacert}/etc/ssl/certs/ca-bundle.crt $out/etc/ssl/certs/
+    ln -s ca-bundle.crt $out/etc/ssl/certs/ca-certificates.crt
+    ln -s certs/ca-bundle.crt $out/etc/ssl/cert.pem
+
+    ln -s ${entrypoint} $out/usr/libexec/github-runner/entrypoint
+  '';
+
+  etcFiles = {
+    passwd = ''
+      root:x:0:0:root:${home}:/bin/bash
+      nobody:x:65534:65534:nobody:/var/empty:/bin/false
+    '';
+    group = ''
+      root:x:0:
+      nobody:x:65534:
+    '';
+    "nsswitch.conf" = ''
+      passwd: files
+      group: files
+      shadow: files
+      hosts: files dns
+    '';
+    # Single-user Nix as root. An unprivileged container cannot create the
+    # namespaces the build sandbox needs, so builds run unsandboxed, without
+    # build users. The store may be a cache volume that later jobs reuse;
+    # automatic GC keeps it from filling the VM disk.
+    "nix/nix.conf" = ''
+      experimental-features = nix-command flakes
+      sandbox = false
+      build-users-group =
+      max-jobs = auto
+      min-free = 8589934592
+      max-free = 21474836480
+    '';
+  };
+
+  # cache.nixos.org's Linux store paths sit in this Mac's case-insensitive
+  # store with Nix's case hack: of two names in a directory that differ only
+  # in case (terminfo's a/ and A/, some linux-headers files), the later one is
+  # stored as `<name>~nix~case~hack~<n>`. The image needs the real names, which
+  # the hashes in its Nix database describe, so this wraps the upstream stream
+  # script to strip the suffix from every name it archives. Without the case
+  # hack (a case-sensitive store) it changes nothing.
+  caseSensitiveStreamScript =
+    upstream:
+    pkgs.writers.writePython3 "stream-case-sensitive" { } ''
+      import runpy
+      import tarfile
+
+      CASE_HACK = "~nix~case~hack~"
+      gettarinfo = tarfile.TarFile.gettarinfo
+
+
+      def gettarinfo_without_case_hack(self, *args, **kwargs):
+          info = gettarinfo(self, *args, **kwargs)
+          info.name = "/".join(
+              part.split(CASE_HACK)[0] for part in info.name.split("/")
+          )
+          return info
+
+
+      tarfile.TarFile.gettarinfo = gettarinfo_without_case_hack
+      runpy.run_path(
+          "${upstream}",
+          run_name="__main__",
+      )
+    '';
+
+  # A script that writes the image to stdout in `docker load` format; the
+  # layers are the store paths themselves, assembled when it runs. Its tag is
+  # a hash of the image's contents and config.
+  image =
+    (pkgs.dockerTools.streamLayeredImage {
+      name = "github-runner-linux";
+      architecture = linuxPkgs.go.GOARCH;
+      contents = [ rootfs ];
+      includeNixDB = true;
+      # Writable directories and the /etc files. They are created here as
+      # the building user, but the stream script records every file in the
+      # image as owned by 0:0, so they belong to root in the container.
+      extraCommands = ''
+        ln -s usr/bin bin
+        mkdir -p usr/local/bin var
+        mkdir -m 1777 tmp var/tmp
+        mkdir -m 0555 var/empty
+        mkdir -m 0700 .${home}
+        mkdir -m 0755 .${runnerRoot}
+      ''
+      + lib.concatStrings (
+        lib.mapAttrsToList (name: text: ''
+          mkdir -p "$(dirname etc/${name})"
+          printf '%s' ${lib.escapeShellArg text} > etc/${name}
+        '') etcFiles
+      );
+      config = {
+        Entrypoint = [ "${entrypoint}" ];
+        User = "0:0";
+        WorkingDir = home;
+        Env = [
+          "PATH=${home}/.cargo/bin:${home}/.nix-profile/bin:/usr/local/bin:/usr/bin"
+          "HOME=${home}"
+          "USER=root"
+          "LANG=C.UTF-8"
+          "SSL_CERT_FILE=/etc/ssl/certs/ca-bundle.crt"
+          "NIX_SSL_CERT_FILE=/etc/ssl/certs/ca-bundle.crt"
+          "PKG_CONFIG_PATH=/usr/lib/pkgconfig"
+          "CPATH=/usr/include"
+          # Outside a Nix build, gcc's wrapper knows only its own and glibc's
+          # libraries. gcc turns LIBRARY_PATH into -L flags, and for a store
+          # directory the wrapper also adds an rpath, so the test binaries
+          # that link -lsqlite3 run too.
+          "LIBRARY_PATH=${lib.getLib linuxPkgs.sqlite}/lib"
+          # Where nixpkgs' runner wrappers keep the runner's state and
+          # configuration (default ~/.github-runner); the jobs' work tree is
+          # its _work.
+          "RUNNER_ROOT=${runnerRoot}"
+          # Diagnostic logs stay in files in the container.
+          "ACTIONS_RUNNER_PRINT_LOG_TO_STDOUT=false"
+        ];
+      };
+    }).overrideAttrs
+      (old: {
+        streamScript = caseSensitiveStreamScript old.streamScript;
+      });
 
   launcher = pkgs.writeShellApplication {
     name = "github-runner-linux";
@@ -48,25 +258,12 @@ let
       ORG = cfg.org;
       RUNNER_NAME = runnerName;
       RUNNER_GROUP = lcfg.runnerGroup;
-      RUNNER_LABELS = lib.concatStringsSep "," (
-        [
-          "self-hosted"
-          "Linux"
-          (if isAarch64 then "ARM64" else "X64")
-        ]
-        ++ lcfg.extraLabels
-      );
+      RUNNER_LABELS = lib.concatStringsSep "," lcfg.extraLabels;
       TOKEN_FILE = config.sops.secrets."github-runner-token-linux".path;
-      DOCKERFILE = "${dockerfile}";
-      RUNNER_VERSION = runnerVersion;
-      NIX_VERSION = nixVersion;
-      IMAGE_TAG = imageTag;
+      IMAGE_STREAM = "${image}";
+      IMAGE_NAME = image.imageName;
+      IMAGE_TAG = image.imageTag;
       CACHE_VOLUMES = lib.boolToString lcfg.cacheVolumes;
-      DOCKER_CONFIG_JSON = pkgs.writeText "docker-config.json" (
-        builtins.toJSON {
-          cliPluginsExtraDirs = [ "${pkgs.docker-buildx}/libexec/docker/cli-plugins" ];
-        }
-      );
     };
     text = builtins.readFile ../../configs/github-runner-linux/launcher.sh;
   };
@@ -75,9 +272,10 @@ in
   options.kaidong-desktop.services.githubRunners.linux = {
     enable = lib.mkEnableOption ''
       the containerized Linux runner: a Colima VM plus a launcher that runs
-      every job in a fresh container as an ephemeral just-in-time runner
-      (labels self-hosted, Linux, ARM64). Both are boot-time launchd daemons
-      running as the hidden `${user}` user
+      every job in a fresh container, from an image built by Nix, as an
+      ephemeral runner registered for that job (labels self-hosted, Linux,
+      ARM64). Both are boot-time launchd daemons running as the hidden
+      `${user}` user
     '';
 
     extraLabels = lib.mkOption {
@@ -89,7 +287,7 @@ in
     runnerGroup = lib.mkOption {
       type = lib.types.str;
       default = "Default";
-      description = "Organization runner group the just-in-time runners join.";
+      description = "Organization runner group the ephemeral runners join.";
     };
 
     cpus = lib.mkOption {
@@ -197,7 +395,7 @@ in
       script = ''
         exec colima start default --foreground \
           --save-config=false --activate=false --ssh-config=false \
-          --runtime docker --arch ${if isAarch64 then "aarch64" else "x86_64"} \
+          --runtime docker --arch ${cpu} \
           --vm-type ${lcfg.vmType} --cpus ${toString lcfg.cpus} \
           --memory ${toString lcfg.memory} --disk ${toString lcfg.disk} \
           --mount none

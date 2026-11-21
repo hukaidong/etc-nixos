@@ -2,19 +2,19 @@
 # darwin/services/github-runner-linux.nix wraps this file with
 # writeShellApplication (strict mode, PATH) and runs it as a launchd daemon.
 #
-# Each run creates one ephemeral just-in-time runner, runs it in a fresh
-# container until it has finished a job, and exits; launchd (KeepAlive) then
-# starts the next run. The organization token stays on the host: the
-# container only receives the single-use JIT config.
+# Each run registers one ephemeral runner, runs it in a fresh container until
+# it has finished a job, and exits; launchd (KeepAlive) then starts the next
+# run. The organization token stays on the host: the container only receives
+# a short-lived registration token, on its standard input, which the image's
+# entrypoint (entrypoint.sh in this directory) hands to config.sh.
 #
-# Inputs (environment): ORG, RUNNER_NAME, RUNNER_GROUP, RUNNER_LABELS
-# (comma-separated), TOKEN_FILE, DOCKERFILE, RUNNER_VERSION, NIX_VERSION,
-# IMAGE_TAG, CACHE_VOLUMES (true/false), DOCKER_CONFIG_JSON; DOCKER_HOST and
-# DOCKER_CONFIG for the docker CLI.
+# Inputs (environment): ORG, RUNNER_NAME, RUNNER_GROUP, RUNNER_LABELS (extra
+# labels, comma-separated, possibly empty), TOKEN_FILE, IMAGE_STREAM (writes
+# the Nix-built image to stdout, in `docker load` format), IMAGE_NAME,
+# IMAGE_TAG, CACHE_VOLUMES (true/false); DOCKER_HOST and DOCKER_CONFIG for the
+# docker CLI.
 
-image_repo=github-runner-linux
-image="$image_repo:$IMAGE_TAG"
-base_repo=ghcr.io/actions/actions-runner
+image="$IMAGE_NAME:$IMAGE_TAG"
 volume_label="org.nixos.github-runner-linux=$RUNNER_NAME"
 
 log() {
@@ -59,10 +59,6 @@ github() {
   printf '%s\n' "$response"
 }
 
-# The docker CLI finds the buildx plugin through this config.
-mkdir -p "$DOCKER_CONFIG"
-install -m 0644 "$DOCKER_CONFIG_JSON" "$DOCKER_CONFIG/config.json"
-
 # sops-nix decrypts the token at boot, possibly after launchd started us.
 wait_for 300 "the token in $TOKEN_FILE" test -s "$TOKEN_FILE"
 token=$(<"$TOKEN_FILE")
@@ -71,65 +67,48 @@ token=$(<"$TOKEN_FILE")
 wait_for 900 "docker at $DOCKER_HOST" docker info
 
 if ! docker image inspect "$image" >/dev/null 2>&1; then
-  log "building $image (runner $RUNNER_VERSION, nix $NIX_VERSION)"
-  docker build --pull --progress=plain --tag "$image" \
-    --build-arg "RUNNER_VERSION=$RUNNER_VERSION" \
-    --build-arg "NIX_VERSION=$NIX_VERSION" \
-    - <"$DOCKERFILE"
+  # The image is already built: the stream script assembles it from the Nix
+  # store on the fly, so loading needs no network.
+  log "loading $image"
+  "$IMAGE_STREAM" | docker load
 
-  # Drop what earlier builds left: older image tags, the base images they
-  # were built from, and their cache volumes.
+  # Drop what earlier images left: their tags and their cache volumes.
   while read -r ref; do
-    [[ $ref == "$image" || $ref == "$base_repo:$RUNNER_VERSION" ]] ||
-      docker image rm "$ref" >/dev/null || true
-  done < <(
-    docker image ls --format '{{.Repository}}:{{.Tag}}' "$image_repo"
-    docker image ls --format '{{.Repository}}:{{.Tag}}' "$base_repo"
-  )
+    [[ $ref == "$image" ]] || docker image rm "$ref" >/dev/null || true
+  done < <(docker image ls --format '{{.Repository}}:{{.Tag}}' "$IMAGE_NAME")
   while read -r volume; do
     [[ $volume == *"-$IMAGE_TAG" ]] || docker volume rm "$volume" >/dev/null || true
   done < <(docker volume ls --quiet --filter "label=$volume_label")
   docker image prune --force >/dev/null || true
 fi
 
-# A runner killed mid-job, or before it got one, stays registered (offline)
-# under this name until GitHub drops it a day later. Clear it so the name is
-# free for the new just-in-time runner.
+# A runner killed mid-job, or before it got one, leaves its container behind
+# if docker did not get to remove it. Its registration (offline) is replaced
+# by the new runner of the same name: the entrypoint passes --replace.
 docker rm --force "$RUNNER_NAME" >/dev/null 2>&1 || true
-name_query=$(jq -rn --arg name "$RUNNER_NAME" '$name | @uri')
-runners=$(github GET "/orgs/$ORG/actions/runners?name=$name_query&per_page=100")
-while read -r id; do
-  log "removing stale registration $id"
-  github DELETE "/orgs/$ORG/actions/runners/$id" >/dev/null || true
-done < <(jq -r --arg name "$RUNNER_NAME" '.runners[] | select(.name == $name) | .id' <<<"$runners")
 
-groups=$(github GET "/orgs/$ORG/actions/runner-groups?per_page=100")
-group_id=$(jq -r --arg group "$RUNNER_GROUP" '.runner_groups[] | select(.name == $group) | .id' <<<"$groups")
-if [[ -z $group_id ]]; then
-  log "no runner group named '$RUNNER_GROUP' in $ORG"
+# Valid for an hour, but used once, right away.
+registration=$(github POST "/orgs/$ORG/actions/runners/registration-token")
+registration_token=$(jq -r '.token // empty' <<<"$registration")
+if [[ -z $registration_token ]]; then
+  log "GitHub returned no registration token"
   exit 1
 fi
 
-request=$(jq -n \
-  --arg name "$RUNNER_NAME" \
-  --argjson group "$group_id" \
-  --arg labels "$RUNNER_LABELS" \
-  '{name: $name, runner_group_id: $group, labels: ($labels | split(",")), work_folder: "_work"}')
-jit=$(github POST "/orgs/$ORG/actions/runners/generate-jitconfig" --data-binary "$request")
-ACTIONS_RUNNER_INPUT_JITCONFIG=$(jq -r '.encoded_jit_config // empty' <<<"$jit")
-if [[ -z $ACTIONS_RUNNER_INPUT_JITCONFIG ]]; then
-  log "GitHub returned no just-in-time runner config"
-  exit 1
+# config.sh options; it adds the labels self-hosted, Linux and the
+# architecture itself.
+runner_args=(--url "https://github.com/$ORG" --name "$RUNNER_NAME" --runnergroup "$RUNNER_GROUP")
+if [[ -n $RUNNER_LABELS ]]; then
+  runner_args+=(--labels "$RUNNER_LABELS")
 fi
-# Passed by name to `docker run --env`, so it stays out of the argv; the
-# runner removes it from its environment before any job step runs.
-export ACTIONS_RUNNER_INPUT_JITCONFIG
 
 mounts=()
 if [[ $CACHE_VOLUMES == true ]]; then
-  # Caches that outlive a job: the Nix store, rustup toolchains and cargo's
-  # registry. Named by image tag, so a rebuilt image starts them afresh.
-  for cache in nix:/nix rustup:/home/runner/.rustup cargo:/home/runner/.cargo; do
+  # Caches that outlive a job: the Nix store (with its database), rustup
+  # toolchains and cargo's registry, under root's home in the image. Named by
+  # image tag, so a new image starts them afresh; docker fills an empty volume
+  # from the image, so the /nix volume starts with the image's store.
+  for cache in nix:/nix rustup:/root/.rustup cargo:/root/.cargo; do
     volume="$RUNNER_NAME-${cache%%:*}-$IMAGE_TAG"
     docker volume inspect "$volume" >/dev/null 2>&1 ||
       docker volume create --label "$volume_label" "$volume" >/dev/null
@@ -138,11 +117,12 @@ if [[ $CACHE_VOLUMES == true ]]; then
 fi
 
 log "starting $RUNNER_NAME from $image"
-# The runner's diagnostic logs stay in the container; its console lines
-# (connected, running job, job finished) land in this daemon's log.
-exec docker run --rm --init --pull never \
+# The registration token goes in on the container's standard input, so it is
+# in neither an argv nor the container's environment, which jobs could read
+# (/proc/1/environ). The runner's diagnostic logs stay in the container; its
+# console lines (connected, running job, job finished) land in this daemon's
+# log.
+exec docker run --rm --init --interactive --pull never \
   --name "$RUNNER_NAME" \
-  --env ACTIONS_RUNNER_INPUT_JITCONFIG \
-  --env ACTIONS_RUNNER_PRINT_LOG_TO_STDOUT=false \
   "${mounts[@]}" \
-  "$image" /home/runner/run.sh
+  "$image" "${runner_args[@]}" <<<"$registration_token"

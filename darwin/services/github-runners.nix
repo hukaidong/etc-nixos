@@ -33,8 +33,8 @@ in
         Key in secrets/secrets.yaml holding a fine-grained personal access
         token owned by {option}`org` with the organization permission
         "Self-hosted runners: Read and write". The macOS runner uses it to
-        register itself; the Linux runner uses it to create a just-in-time
-        runner for every job.
+        register itself; the Linux runner uses it to get a registration token
+        for every job's ephemeral runner.
       '';
     };
 
