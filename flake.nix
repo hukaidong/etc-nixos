@@ -8,6 +8,7 @@
     nix-ai-tools.url = "github:numtide/nix-ai-tools";
     fakwin.url = "github:DMaroo/fakwin";
     home-manager.url = "github:nix-community/home-manager/release-26.05";
+    nix-darwin.url = "github:nix-darwin/nix-darwin/nix-darwin-26.05";
     nix-index-database.url = "github:nix-community/nix-index-database";
     plover-flake.url = "github:openstenoproject/plover-flake";
     sops-nix.url = "github:Mic92/sops-nix";
@@ -16,6 +17,7 @@
 
     nix-index-database.inputs.nixpkgs.follows = "nixpkgs";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
+    nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
     fakwin.inputs.nixpkgs.follows = "nixpkgs";
     fontconfig.inputs.nixpkgs.follows = "nixpkgs";
   };
@@ -263,6 +265,22 @@
             inputs.nix-index-database.homeModules.default
           ];
         };
+
+      # Mac Studio system layer (nix-darwin): the Nix daemon and boot-time
+      # launchd daemons such as the GitHub Actions runners. User-level config
+      # stays in the standalone homeConfigurations.Kaidong-Mac-Studio above.
+      darwinConfigurations.Kaidong-Mac-Studio = inputs.nix-darwin.lib.darwinSystem {
+        specialArgs = {
+          inherit inputs;
+        };
+        modules = [
+          extraPkgsOverlay
+          sysRevConfig
+          inputs.sops-nix.darwinModules.sops
+          ./hosts/kaidong-mac-studio/configuration.nix
+          ./darwin/all.nix
+        ];
+      };
 
       # VM-based module tests
       checks.x86_64-linux =
