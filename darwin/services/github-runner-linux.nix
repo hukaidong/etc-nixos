@@ -15,7 +15,16 @@ let
   # Same layout nix-darwin's github-runner module uses for the macOS runner.
   stateDir = "/var/lib/github-runners/${runnerName}";
   logDir = "/var/log/github-runners/${runnerName}";
-  colimaHome = "${stateDir}/colima";
+  # Colima's directory, with Lima's in its _lima. Colima ignores COLIMA_HOME
+  # unless it exists (and falls back to ~/.colima), so it is the state
+  # directory itself, which activation creates; a subdirectory would also
+  # make the VM's sockets too long (see the assertion).
+  colimaHome = stateDir;
+  # The VM's longest unix socket, Lima's for Colima's user-v2 network, at the
+  # path Lima checks: /var is a symlink to /private/var.
+  longestSocket =
+    lib.optionalString (lib.hasPrefix "/var/" stateDir) "/private"
+    + "${colimaHome}/_lima/_networks/user-v2/user-v2_qemu.sock";
   install = "${pkgs.coreutils}/bin/install";
 
   # aarch64 or x86_64: the VM, the image and the runner's architecture label
@@ -336,10 +345,9 @@ in
   config = lib.mkIf lcfg.enable {
     assertions = [
       {
-        # Lima keeps unix sockets under the VM directory, and macOS caps a
-        # socket path at 104 bytes.
-        assertion = lib.stringLength stateDir <= 60;
-        message = "kaidong-desktop.services.githubRunners.name is too long for the Linux runner's VM sockets under ${stateDir}.";
+        # macOS caps a unix socket path below UNIX_PATH_MAX, 104 bytes.
+        assertion = lib.stringLength longestSocket < 104;
+        message = "kaidong-desktop.services.githubRunners.name is too long for the Linux runner's VM sockets: ${longestSocket} is ${toString (lib.stringLength longestSocket)} bytes, macOS allows 103.";
       }
     ];
 
