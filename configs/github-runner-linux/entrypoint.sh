@@ -21,11 +21,11 @@ if [[ -z $token ]]; then
   exit 1
 fi
 
-# Jobs run as root: the container is their isolation boundary, and they can
-# install what they need, as the official image's passwordless sudo allowed.
-# The token reaches config.sh through the environment rather than its argv,
-# and the runner removes it from there before doing anything else.
-RUNNER_ALLOW_RUNASROOT=1 ACTIONS_RUNNER_INPUT_TOKEN=$token \
+# The image runs this as its unprivileged job user, which owns the runner's
+# directory, the Nix store and its home. The token reaches config.sh through
+# the environment rather than its argv, and the runner removes it from there
+# before doing anything else.
+ACTIONS_RUNNER_INPUT_TOKEN=$token \
   "$GITHUB_RUNNER/bin/config.sh" --unattended --ephemeral --disableupdate \
   --replace --work _work "$@"
 unset token

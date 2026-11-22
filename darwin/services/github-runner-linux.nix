@@ -82,7 +82,17 @@ let
     ]
   );
   sqliteDev = lib.getDev linuxPkgs.sqlite;
-  home = "/root";
+
+  # Jobs run as this unprivileged user, like on GitHub's hosted runners, so
+  # file permissions mean in a job what they mean elsewhere (root reads a
+  # mode-000 file, and tests that expect EACCES fail). It owns the Nix store,
+  # its home (rustup, cargo) and the runner's directory; there is no sudo.
+  jobUser = {
+    name = "runner";
+    uid = 1001;
+    gid = 1001;
+  };
+  home = "/home/${jobUser.name}";
   runnerRoot = "/runner";
 
   # Registers an ephemeral runner and runs it for one job; see the file. The
@@ -139,11 +149,13 @@ let
 
   etcFiles = {
     passwd = ''
-      root:x:0:0:root:${home}:/bin/bash
+      root:x:0:0:root:/root:/bin/bash
+      ${jobUser.name}:x:${toString jobUser.uid}:${toString jobUser.gid}:${jobUser.name}:${home}:/bin/bash
       nobody:x:65534:65534:nobody:/var/empty:/bin/false
     '';
     group = ''
       root:x:0:
+      ${jobUser.name}:x:${toString jobUser.gid}:
       nobody:x:65534:
     '';
     "nsswitch.conf" = ''
@@ -152,10 +164,10 @@ let
       shadow: files
       hosts: files dns
     '';
-    # Single-user Nix as root. An unprivileged container cannot create the
-    # namespaces the build sandbox needs, so builds run unsandboxed, without
-    # build users. The store may be a cache volume that later jobs reuse;
-    # automatic GC keeps it from filling the VM disk.
+    # Single-user Nix, owned by the job user. An unprivileged container
+    # cannot create the namespaces the build sandbox needs, so builds run
+    # unsandboxed, without build users. The store may be a cache volume that
+    # later jobs reuse; automatic GC keeps it from filling the VM disk.
     "nix/nix.conf" = ''
       experimental-features = nix-command flakes
       sandbox = false
@@ -207,16 +219,24 @@ let
       architecture = linuxPkgs.go.GOARCH;
       contents = [ rootfs ];
       includeNixDB = true;
+      # The store layers, /nix and /nix/store belong to the job user, which
+      # runs Nix single-user.
+      inherit (jobUser) uid gid;
+      uname = jobUser.name;
+      gname = jobUser.name;
       # Writable directories and the /etc files. They are created here as
-      # the building user, but the stream script records every file in the
-      # image as owned by 0:0, so they belong to root in the container.
+      # the building user, and the top layer is archived under fakeroot, so
+      # they belong to root in the container unless fakeRootCommands gives
+      # them away. The home's .rustup and .cargo exist so that docker, which
+      # fills an empty cache volume from the image, gives the volume their
+      # owner.
       extraCommands = ''
         ln -s usr/bin bin
-        mkdir -p usr/local/bin var
+        mkdir -p usr/local/bin var home
         mkdir -m 1777 tmp var/tmp
         mkdir -m 0555 var/empty
-        mkdir -m 0700 .${home}
-        mkdir -m 0755 .${runnerRoot}
+        mkdir -m 0700 root .${home}
+        mkdir -m 0755 .${home}/.rustup .${home}/.cargo .${runnerRoot}
       ''
       + lib.concatStrings (
         lib.mapAttrsToList (name: text: ''
@@ -224,14 +244,19 @@ let
           printf '%s' ${lib.escapeShellArg text} > etc/${name}
         '') etcFiles
       );
+      # includeNixDB's database (and an empty nix/store) are in this layer
+      # too, and would otherwise hand /nix back to root.
+      fakeRootCommands = ''
+        chown -R ${toString jobUser.uid}:${toString jobUser.gid} nix .${home} .${runnerRoot}
+      '';
       config = {
         Entrypoint = [ "${entrypoint}" ];
-        User = "0:0";
+        User = "${toString jobUser.uid}:${toString jobUser.gid}";
         WorkingDir = home;
         Env = [
           "PATH=${home}/.cargo/bin:${home}/.nix-profile/bin:/usr/local/bin:/usr/bin"
           "HOME=${home}"
-          "USER=root"
+          "USER=${jobUser.name}"
           "LANG=C.UTF-8"
           "SSL_CERT_FILE=/etc/ssl/certs/ca-bundle.crt"
           "NIX_SSL_CERT_FILE=/etc/ssl/certs/ca-bundle.crt"
@@ -272,6 +297,7 @@ let
       IMAGE_STREAM = "${image}";
       IMAGE_NAME = image.imageName;
       IMAGE_TAG = image.imageTag;
+      IMAGE_HOME = home;
       CACHE_VOLUMES = lib.boolToString lcfg.cacheVolumes;
     };
     text = builtins.readFile ../../configs/github-runner-linux/launcher.sh;
