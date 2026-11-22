@@ -7,8 +7,10 @@
 #
 # Brings the VM that vm.sh runs to the state this flake describes, over SSH,
 # then checks again every INTERVAL seconds; with --once, it makes one pass and
-# exits. The steps are idempotent and say nothing when there is nothing to do;
-# the guest half of each is a command of GUEST_SCRIPT (guest.sh):
+# exits. Each pass first waits for vm.sh to run the VM, which the first time
+# means creating it from the image (a download of about 30 GB). The steps are
+# idempotent and say nothing when there is nothing to do; the guest half of
+# each is a command of GUEST_SCRIPT (guest.sh):
 #
 #  1. First contact: log in with the image's public admin password and make
 #     this daemon's key (KEY_DIR, generated here) the only authorized key.
@@ -115,9 +117,21 @@ bootstrap() {
       "admin@$ip" /bin/bash -s -- authorize 2>/dev/null
 }
 
+# Whether vm.sh runs the VM. While vm.sh is still creating it, the VM does
+# not exist yet, and `tart ip` fails at once, whatever its --wait.
+vm_running() {
+  [[ $(tart get "$VM_NAME" --format json 2>/dev/null | jq -r .Running) == true ]]
+}
+
 find_vm() {
+  local since
+  if ! vm_running; then
+    log "waiting for vm.sh to run $VM_NAME (the first time, it creates it from the image first)"
+    wait_for 3600 "vm.sh to run $VM_NAME" vm_running
+  fi
+  since=$SECONDS
   if ! ip=$(tart ip "$VM_NAME" --wait 600) || [[ -z $ip ]]; then
-    log "$VM_NAME has no address after 10 minutes; is it running?"
+    log "$VM_NAME is running but has no address after $((SECONDS - since))s"
     return 1
   fi
   wait_for 600 "SSH on $VM_NAME ($ip)" sshd_up
