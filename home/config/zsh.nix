@@ -32,6 +32,14 @@
         . '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
       fi
       # End Nix
+
+      # nix-darwin's system profile (darwin-rebuild, and the Nix that
+      # nix-darwin manages) goes ahead of the installer's default profile but
+      # after the user's own. nix-darwin leaves /etc/zshrc alone, so it is
+      # added here.
+      if [[ -d /run/current-system/sw/bin && ''${path[(Ie)/run/current-system/sw/bin]} -eq 0 ]]; then
+        path[''${path[(ie)/nix/var/nix/profiles/default/bin]},0]=(/run/current-system/sw/bin)
+      fi
     '';
   };
 
