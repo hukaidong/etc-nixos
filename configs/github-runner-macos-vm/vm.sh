@@ -12,7 +12,8 @@
 #
 # Inputs (environment): STATE_DIR (on an external volume, it must be mounted),
 # TART_HOME, VM_NAME, IMAGE, CPUS, MEMORY_MIB, DISK_GB, KEY_DIR (provision.sh's
-# SSH key and config, used to shut the guest down cleanly).
+# SSH key and config, used to shut the guest down cleanly); HOME, where the
+# user's login keychain is (created if missing).
 
 log() {
   printf '%s %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$*" >&2
@@ -43,6 +44,22 @@ if (($(jq -r .Disk <<<"$vm_config") < DISK_GB)); then
   log "growing the disk of $VM_NAME to $DISK_GB GB"
   tart set "$VM_NAME" --disk-size "$DISK_GB"
 fi
+
+# Since macOS 15, Virtualization.framework keeps a VM's host key in the login
+# keychain and starts no VM without one, unlocked (Tart's FAQ, "Running Tart
+# headless"); `tart run` would fail with "The virtual machine encountered a
+# security error ... Failed to create new HostKey". This daemon's user never
+# logs in, so it gets a login keychain in its home with an empty password,
+# which guards nothing that the home, private to this user, does not.
+if [[ ! -e $HOME/Library/Keychains/login.keychain-db ]]; then
+  log "creating a login keychain for $(id -un) in $HOME"
+  /usr/bin/security create-keychain -p '' login.keychain
+fi
+/usr/bin/security unlock-keychain -p '' login.keychain
+# No settings: it never locks itself again, after a timeout or on sleep.
+/usr/bin/security set-keychain-settings login.keychain
+/usr/bin/security login-keychain -s login.keychain
+/usr/bin/security default-keychain -s login.keychain
 
 # Without a guest agent, `tart stop` powers the VM off at once, so shut macOS
 # down from inside first, with provision.sh's key, and power off only what is
