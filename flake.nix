@@ -179,23 +179,29 @@
         };
     in
     {
-      devShells.x86_64-linux.default =
+      # One shell per platform this flake manages (NixOS hosts and the Mac
+      # Studio), so `use flake` in .envrc works on every machine.
+      devShells = nixpkgs.lib.genAttrs [ "x86_64-linux" "aarch64-darwin" ] (
+        system:
         let
-          pkgs = nixpkgs.legacyPackages.x86_64-linux;
+          pkgs = nixpkgs.legacyPackages.${system};
           update-command = mkUpdateCommand pkgs;
           upstream-check-command = mkUpstreamCheck pkgs;
         in
-        pkgs.mkShell {
-          packages = [
-            update-command
-            upstream-check-command
-          ];
-          shellHook = ''
-            echo "NixOS config shell loaded."
-            echo "  update          - update flake.lock and push"
-            echo "  upstream-check  - probe upstream fixes for carried workarounds"
-          '';
-        };
+        {
+          default = pkgs.mkShell {
+            packages = [
+              update-command
+              upstream-check-command
+            ];
+            shellHook = ''
+              echo "nix-config shell loaded."
+              echo "  update          - update flake.lock and push"
+              echo "  upstream-check  - probe upstream fixes for carried workarounds"
+            '';
+          };
+        }
+      );
 
       # Main desktop with pure i3
       nixosConfigurations.Kaidong-Main-Desktop = nixpkgs.lib.nixosSystem {
