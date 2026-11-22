@@ -11,8 +11,8 @@
 # Inputs (environment): ORG, RUNNER_NAME, RUNNER_GROUP, RUNNER_LABELS (extra
 # labels, comma-separated, possibly empty), TOKEN_FILE, IMAGE_STREAM (writes
 # the Nix-built image to stdout, in `docker load` format), IMAGE_NAME,
-# IMAGE_TAG, CACHE_VOLUMES (true/false); DOCKER_HOST and DOCKER_CONFIG for the
-# docker CLI.
+# IMAGE_TAG, IMAGE_HOME (the home of the image's job user), CACHE_VOLUMES
+# (true/false); DOCKER_HOST and DOCKER_CONFIG for the docker CLI.
 
 image="$IMAGE_NAME:$IMAGE_TAG"
 volume_label="org.nixos.github-runner-linux=$RUNNER_NAME"
@@ -105,10 +105,11 @@ fi
 mounts=()
 if [[ $CACHE_VOLUMES == true ]]; then
   # Caches that outlive a job: the Nix store (with its database), rustup
-  # toolchains and cargo's registry, under root's home in the image. Named by
+  # toolchains and cargo's registry, under the job user's home. Named by
   # image tag, so a new image starts them afresh; docker fills an empty volume
-  # from the image, so the /nix volume starts with the image's store.
-  for cache in nix:/nix rustup:/root/.rustup cargo:/root/.cargo; do
+  # from the image, contents and owner, so the /nix volume starts with the
+  # image's store and every volume belongs to the job user.
+  for cache in nix:/nix rustup:"$IMAGE_HOME/.rustup" cargo:"$IMAGE_HOME/.cargo"; do
     volume="$RUNNER_NAME-${cache%%:*}-$IMAGE_TAG"
     docker volume inspect "$volume" >/dev/null 2>&1 ||
       docker volume create --label "$volume_label" "$volume" >/dev/null
