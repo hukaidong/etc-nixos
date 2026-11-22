@@ -12,52 +12,12 @@
 # labels, comma-separated, possibly empty), TOKEN_FILE, IMAGE_STREAM (writes
 # the Nix-built image to stdout, in `docker load` format), IMAGE_NAME,
 # IMAGE_TAG, IMAGE_HOME (the home of the image's job user), CACHE_VOLUMES
-# (true/false); DOCKER_HOST and DOCKER_CONFIG for the docker CLI.
+# (true/false); DOCKER_HOST and DOCKER_CONFIG for the docker CLI. The helpers
+# log, wait_for and github come from configs/github-runners/common.sh, which
+# the module puts in front of this file.
 
 image="$IMAGE_NAME:$IMAGE_TAG"
 volume_label="org.nixos.github-runner-linux=$RUNNER_NAME"
-
-log() {
-  printf '%s %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$*" >&2
-}
-
-# wait_for SECONDS WHAT COMMAND...: retry COMMAND every 5s until it succeeds.
-wait_for() {
-  local timeout=$1 what=$2 waited=0
-  shift 2
-  until "$@" >/dev/null 2>&1; do
-    if ((waited >= timeout)); then
-      log "gave up after ${timeout}s waiting for $what"
-      return 1
-    fi
-    sleep 5
-    waited=$((waited + 5))
-  done
-}
-
-# github METHOD PATH [CURL_ARGS...]: GitHub REST call; prints the body. The
-# token goes through a file descriptor so it never appears in `ps`.
-github() {
-  local method=$1 path=$2 response status
-  shift 2
-  response=$(curl --silent --show-error --retry 3 \
-    --request "$method" \
-    --header @<(printf 'Authorization: Bearer %s\n' "$token") \
-    --header 'Accept: application/vnd.github+json' \
-    --header 'X-GitHub-Api-Version: 2022-11-28' \
-    --write-out '\n%{http_code}' \
-    "$@" "https://api.github.com$path") || {
-    log "GitHub API $method $path: request failed"
-    return 1
-  }
-  status=${response##*$'\n'}
-  response=${response%$'\n'*}
-  if [[ $status != 2?? ]]; then
-    log "GitHub API $method $path: HTTP $status ${response:0:300}"
-    return 1
-  fi
-  printf '%s\n' "$response"
-}
 
 # sops-nix decrypts the token at boot, possibly after launchd started us.
 wait_for 300 "the token in $TOKEN_FILE" test -s "$TOKEN_FILE"

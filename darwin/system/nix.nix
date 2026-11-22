@@ -12,8 +12,7 @@
       "nix-command"
     ];
     accept-flake-config = true;
-    # nix-darwin already trusts root.
-    trusted-users = [ "kaidong" ];
+    # nix-darwin already trusts root; hosts add their users.
   };
 
   # Home-manager owns interactive shell setup (home/config/zsh.nix), so

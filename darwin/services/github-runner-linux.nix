@@ -12,18 +12,22 @@ let
   user = "_github-runner-linux";
   group = user;
   runnerName = "${cfg.name}-linux";
-  # Same layout nix-darwin's github-runner module uses for the macOS runner.
-  stateDir = "/var/lib/github-runners/${runnerName}";
+  stateDir = "${cfg.stateRoot}/${runnerName}";
   logDir = "/var/log/github-runners/${runnerName}";
   # Colima's directory, with Lima's in its _lima. Colima ignores COLIMA_HOME
   # unless it exists (and falls back to ~/.colima), so it is the state
-  # directory itself, which activation creates; a subdirectory would also
-  # make the VM's sockets too long (see the assertion).
+  # directory itself, which activation creates (once its volume is mounted)
+  # and both daemons wait for; a subdirectory would also make the VM's
+  # sockets longer (see the assertion).
   colimaHome = stateDir;
   # The VM's longest unix socket, Lima's for Colima's user-v2 network, at the
-  # path Lima checks: /var is a symlink to /private/var.
+  # path Lima checks: /var, /tmp and /etc are symlinks into /private.
   longestSocket =
-    lib.optionalString (lib.hasPrefix "/var/" stateDir) "/private"
+    lib.optionalString (lib.any (d: lib.hasPrefix "/${d}/" stateDir) [
+      "var"
+      "tmp"
+      "etc"
+    ]) "/private"
     + "${colimaHome}/_lima/_networks/user-v2/user-v2_qemu.sock";
   install = "${pkgs.coreutils}/bin/install";
 
@@ -300,7 +304,9 @@ let
       IMAGE_HOME = home;
       CACHE_VOLUMES = lib.boolToString lcfg.cacheVolumes;
     };
-    text = builtins.readFile ../../configs/github-runner-linux/launcher.sh;
+    text =
+      builtins.readFile ../../configs/github-runners/common.sh
+      + builtins.readFile ../../configs/github-runner-linux/launcher.sh;
   };
 in
 {
@@ -373,7 +379,7 @@ in
       {
         # macOS caps a unix socket path below UNIX_PATH_MAX, 104 bytes.
         assertion = lib.stringLength longestSocket < 104;
-        message = "kaidong-desktop.services.githubRunners.name is too long for the Linux runner's VM sockets: ${longestSocket} is ${toString (lib.stringLength longestSocket)} bytes, macOS allows 103.";
+        message = "The Linux runner's state directory ${stateDir} is too long for its VM's sockets: ${longestSocket} is ${toString (lib.stringLength longestSocket)} bytes, macOS allows 103; shorten kaidong-desktop.services.githubRunners.stateRoot or name.";
       }
     ];
 
@@ -398,12 +404,15 @@ in
       mode = "0400";
     };
 
-    # The daemons' directories must exist, owned by the service user, before
-    # launchd starts them.
+    # The daemons' directories, owned by the service user, before launchd
+    # starts them. github-runners.nix creates the state directory, once its
+    # volume is mounted.
+    kaidong-desktop.services.githubRunners.stateDirs.${stateDir} = {
+      owner = user;
+      inherit group;
+    };
     system.activationScripts.launchd.text = lib.mkBefore ''
-      echo >&2 "setting up GitHub Runner '${runnerName}'..."
-      ${install} -d -m 0755 /var/lib/github-runners /var/log/github-runners
-      ${install} -d -m 0700 -o ${user} -g ${group} ${stateDir}
+      ${install} -d -m 0755 /var/log/github-runners
       ${install} -d -m 0750 -o ${user} -g ${group} ${logDir}
     '';
 
@@ -427,6 +436,9 @@ in
         COLIMA_HOME = colimaHome;
       };
       script = ''
+        set -e
+        ${lib.getExe cfg.requireStateDir} ${stateDir}
+        cd ${stateDir}
         exec colima start default --foreground \
           --save-config=false --activate=false --ssh-config=false \
           --runtime docker --arch ${cpu} \
@@ -444,7 +456,6 @@ in
         ExitTimeOut = 60;
         ProcessType = "Interactive";
         SoftResourceLimits.NumberOfFiles = 4096;
-        WorkingDirectory = stateDir;
         StandardOutPath = "${logDir}/vm.log";
         StandardErrorPath = "${logDir}/vm.log";
       };
@@ -455,7 +466,12 @@ in
       environment = dockerEnv // {
         DOCKER_HOST = "unix://${colimaHome}/default/docker.sock";
       };
-      command = lib.getExe launcher;
+      script = ''
+        set -e
+        ${lib.getExe cfg.requireStateDir} ${stateDir}
+        cd ${stateDir}
+        exec ${lib.getExe launcher}
+      '';
       serviceConfig = {
         UserName = user;
         GroupName = group;
@@ -463,7 +479,6 @@ in
         KeepAlive = true;
         ThrottleInterval = 30;
         ProcessType = "Interactive";
-        WorkingDirectory = stateDir;
         StandardOutPath = "${logDir}/runner.log";
         StandardErrorPath = "${logDir}/runner.log";
       };

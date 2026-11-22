@@ -128,6 +128,23 @@
         home-manager.nixosModules.home-manager
         sops-nix.nixosModules.sops
       ];
+      # nix-darwin systems: the host file plus every module under darwin/.
+      # sops-nix declares the sops options those modules set; it does nothing
+      # on a system without secrets.
+      mkDarwin =
+        host:
+        inputs.nix-darwin.lib.darwinSystem {
+          specialArgs = {
+            inherit inputs;
+          };
+          modules = [
+            extraPkgsOverlay
+            sysRevConfig
+            inputs.sops-nix.darwinModules.sops
+            host
+            ./darwin/all.nix
+          ];
+        };
       mkUpdateCommand =
         pkgs:
         pkgs.writeShellScriptBin "update" ''
@@ -269,18 +286,11 @@
       # Mac Studio system layer (nix-darwin): the Nix daemon and boot-time
       # launchd daemons such as the GitHub Actions runners. User-level config
       # stays in the standalone homeConfigurations.Kaidong-Mac-Studio above.
-      darwinConfigurations.Kaidong-Mac-Studio = inputs.nix-darwin.lib.darwinSystem {
-        specialArgs = {
-          inherit inputs;
-        };
-        modules = [
-          extraPkgsOverlay
-          sysRevConfig
-          inputs.sops-nix.darwinModules.sops
-          ./hosts/kaidong-mac-studio/configuration.nix
-          ./darwin/all.nix
-        ];
-      };
+      darwinConfigurations.Kaidong-Mac-Studio = mkDarwin ./hosts/kaidong-mac-studio/configuration.nix;
+
+      # The Mac Studio's macOS runner VM. The Mac Studio builds this system and
+      # deploys it into the VM (darwin/services/github-runner-macos-vm.nix).
+      darwinConfigurations.Kaidong-Mac-Studio-runner-vm = mkDarwin ./hosts/kaidong-mac-studio-runner-vm/configuration.nix;
 
       # VM-based module tests
       checks.x86_64-linux =
