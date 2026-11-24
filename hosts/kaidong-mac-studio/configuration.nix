@@ -26,4 +26,13 @@
       memory = 12;
     };
   };
+
+  # Tunnel to the DigitalOcean droplet (nixos-lab is the hub): this machine is
+  # mac-studio.wg.internal at the address below, which must match its entry
+  # in nixos-lab's hosts table. The hub's key and endpoint are the defaults in
+  # darwin/networking/wireguard.nix. See .github/wiki/WireGuard.md.
+  kaidong-desktop.networking.wireguard = {
+    enable = true;
+    address = "10.77.0.2";
+  };
 }
