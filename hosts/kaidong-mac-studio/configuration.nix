@@ -26,4 +26,20 @@
       memory = 12;
     };
   };
+
+  # Tunnel to the DigitalOcean droplet (nixos-lab is the hub): this machine is
+  # mac-studio.wg.internal at the address below, which must match its entry
+  # in nixos-lab's hosts table. This machine's private key and the hub's
+  # `IP:port` are `wireguard-mac-studio-private-key` and
+  # `wireguard-hub-endpoint` in secrets/secrets.yaml. See
+  # .github/wiki/WireGuard.md.
+  kaidong-desktop.networking.wireguard = {
+    enable = true;
+    address = "10.77.0.2";
+    privateKeySecret = "wireguard-mac-studio-private-key";
+    hub = {
+      publicKey = "La77HxNKrh5nw1+rW3lOcvw/vnefyeWyleOs+abFhnI=";
+      endpointSecret = "wireguard-hub-endpoint";
+    };
+  };
 }
