@@ -12,7 +12,7 @@ Two modules set it up, one per repository:
 | Address | `10.77.0.1` (`digix.wg.internal`) | `10.77.0.2` (`mac-studio.wg.internal`) |
 | Interface | `wg0`, listening on UDP 51820 | `wg0` (really `utunN`; see `/var/run/wireguard/wg0.name`) |
 | Runs as | `wireguard-wg0.service`, one `wireguard-wg0-peer-*.service` per peer | launchd daemon `org.nixos.wireguard-wg0`, which runs `wg-quick up` |
-| Private key | `/var/lib/wireguard/wg0.key`, made on first start | `/var/lib/wireguard/wg0.key`, made on first `darwin-rebuild switch` |
+| Private key | `/var/lib/wireguard/wg0.key`, made on first start | `wireguard-mac-studio-private-key` in `secrets/secrets.yaml`, decrypted to `/run/secrets/wireguard-wg0-private-key` |
 | DNS | dnsmasq on `10.77.0.1:53`, tunnel only | `/etc/resolver/wg.internal`, which sends only `*.wg.internal` to the hub |
 | Logs | `journalctl -u wireguard-wg0 -u dnsmasq` | `/var/log/wireguard-wg0.log` |
 
@@ -34,8 +34,10 @@ Commands that change something are marked **Changes state**.
   DNS aliases. It drives the hub's peers, the `wg.internal` zone and the
   droplet's `/etc/hosts`. A machine listed without a key is in DNS but not
   yet a peer.
-- **Private keys never leave their machine.** Each machine creates its own
-  key; only public keys are in the repositories.
+- **Private keys.** The droplet creates its own key, which never leaves it.
+  The Mac's key is in sops, so a reinstalled Mac keeps its identity; without
+  `privateKeySecret` the Mac would also create its own. Only public keys are
+  in the repositories in plain text.
 - **Split DNS.** The Mac asks the hub only for names under `wg.internal`.
   macOS reads `/etc/resolver/<domain>`, but `dig`, `host` and `nslookup` do
   not: test with `ping`, `ssh`, `dscacheutil -q host -a name <name>` or
@@ -58,9 +60,19 @@ deploys.
    If a DigitalOcean Cloud Firewall is attached to the droplet, allow
    inbound **UDP 51820** there too; the NixOS firewall already allows it.
 
-2. **Mac Studio.** In etc-nixos, set the hub's key and address as the
-   defaults of `hub.publicKey` and `hub.endpoint` in
-   `darwin/networking/wireguard.nix` (for example `"203.0.113.7:51820"`).
+2. **Mac Studio.** In etc-nixos, set the hub's key as `hub.publicKey` in
+   `hosts/kaidong-mac-studio/configuration.nix`. The Mac's private key and
+   the hub's address go in sops, not in the repository: make a key with
+   `wg genkey`, then `sops secrets/secrets.yaml` and add
+
+   ```yaml
+   wireguard-mac-studio-private-key: <output of wg genkey>
+   wireguard-hub-endpoint: 203.0.113.7:51820
+   ```
+
+   The host's `privateKeySecret` and `hub.endpointSecret` name these keys
+   (`hub.endpoint` would take the address in plain text instead, and without
+   `privateKeySecret` activation creates a key in `/var/lib/wireguard/wg0.key`).
    Use the IP rather than a name: a `hukaidong.com` name proxied by Cloudflare
    cannot carry WireGuard's UDP, and an IP needs no DNS at boot. A DigitalOcean
    Reserved IP keeps the address if the droplet is replaced. Then
@@ -70,11 +82,16 @@ deploys.
    sudo darwin-rebuild switch --flake .#Kaidong-Mac-Studio
    ```
 
-   Activation prints `wireguard: wg0 public key: ...`. Activation reprints it
-   every time, and you can also read it with
-   `sudo wg pubkey < /var/lib/wireguard/wg0.key`.
+   Activation prints `wireguard: wg0 public key: ...` on every switch, and
+   warns if `hub.publicKey` is that same key (the Mac's own key in the hub's
+   place makes WireGuard drop the peer). You can also read it with
+   `sudo wg pubkey < /run/secrets/wireguard-wg0-private-key`.
 
-   Until step 2 has both values, activation warns and only creates the key.
+   Until step 2 has both the hub's key and its address, activation warns and
+   only prints the Mac's public key. The switch fails to build if either sops
+   key is missing from `secrets/secrets.yaml`. The first switch with the new secret can stop at
+   sops-install-secrets (the race in [GitHub-Runners.md](GitHub-Runners.md));
+   run it again.
 
 3. **Hub again.** In nixos-lab, paste the Mac's public key into
    `hosts.mac-studio.publicKey` (and the droplet's own key into
@@ -86,6 +103,7 @@ On the Mac Studio:
 
 ```sh
 sudo wg show                          # "latest handshake" under 2 minutes ago
+sudo wg show "$(sudo cat /var/run/wireguard/wg0.name)"   # just wg0; `wg show wg0` fails here
 ping -c3 10.77.0.1
 ping -c3 digix.wg.internal            # through /etc/resolver
 scutil --dns | grep -B1 -A3 wg.internal
@@ -119,7 +137,11 @@ is off.
 - **Config changes apply on switch.** When `darwin-rebuild switch` changes
   the tunnel's config, the job's plist changes too, so activation reloads the
   job and the tunnel comes back up with the new config. Connections over the
-  tunnel drop for a moment.
+  tunnel drop for a moment. A new `wireguard-hub-endpoint` or
+  `wireguard-mac-studio-private-key` in `secrets/secrets.yaml` does not change
+  the plist; activation sets it on the running tunnel with `wg set` instead,
+  without taking it down. A new private key also needs its public key in the
+  hub's hosts table.
 - **Add a machine.** Give it the next free address in the hosts table in
   nixos-lab, with `publicKey = null`. Configure it as a spoke with that
   address (a NixOS machine can mirror the darwin module with
@@ -136,23 +158,35 @@ is off.
 runs `wg-quick up`. Its config generation is used as-is, but its job is
 replaced (`autostart = false`), for two reasons:
 
-- `wg-quick` on macOS starts helper processes and exits. Without
-  `AbandonProcessGroup`, launchd kills what the job leaves behind when it
-  exits ([wireguard list, 2018](https://lists.zx2c4.com/pipermail/wireguard/2018-July/003168.html)).
+- `wg-quick` on macOS starts helper processes: `wireguard-go`, and a route
+  monitor that it waits on when launchd runs it (so `launchctl print` shows
+  the job as running). Without `AbandonProcessGroup`, launchd kills the job's
+  whole process group when the job stops ([wireguard list, 2018](https://lists.zx2c4.com/pipermail/wireguard/2018-July/003168.html)).
 - Its plist never changes with the config, and `wg-quick up` fails on an
   interface that is already up, so a changed config would wait for a reboot.
   This job's script names the config's store path, so a new config means a
   new plist, which makes activation reload the job; the job takes the tunnel
   down before bringing it up.
 
-**Why the keys are not in sops.** A key made on the machine never exists
-anywhere else, not even encrypted in a repository, and it is on disk before
-the tunnel's job first starts. A sops secret is decrypted by a separate
-launchd job at boot, which the tunnel would have to wait for (and see the
-sops-install-secrets race in [GitHub-Runners.md](GitHub-Runners.md)). The
-catch is on the droplet: if it is rebuilt from an image, it makes a new key,
-and every spoke needs the new public key. To avoid that, keep the droplet's
-key in nixos-lab's sops file and point `privateKeyFile` at the secret.
+**Where the keys live.** A key made on the machine never exists anywhere
+else, not even encrypted in a repository, and it is on disk before the
+tunnel's job first starts; but a reinstalled machine makes a new key, and the
+hub's hosts table needs the new public key. The Mac's key is therefore in
+sops (`privateKeySecret`), which keeps its public key across reinstalls. The
+droplet still makes its own; if it is rebuilt from an image, every spoke
+needs its new public key. To avoid that, keep the droplet's key in
+nixos-lab's sops file and point `privateKeyFile` at the secret.
+
+**Secrets and the tunnel's job.** The endpoint is not a secret, but sops
+keeps the droplet's address out of the repository. Neither secret goes in
+the Nix store: `wg0.conf`'s `PostUp` loads the key with `wg set ...
+private-key` (as nix-darwin's module always does) and sets the endpoint with
+`wg set ... endpoint`, both from `/run/secrets`. A separate launchd job
+decrypts the secrets at boot, so the tunnel's job waits up to a minute for
+them, then exits and launchd retries every 30 seconds. On a switch,
+activation reloads the job before it installs the secrets, so a switch that
+changes the job hits the same wait. A secret that changes on its own does
+not change the plist; activation sets it on the running tunnel instead.
 
 **Why not a mesh VPN.** Tailscale with Headscale, NetBird, Nebula and
 ZeroTier add NAT traversal between spokes, client apps and access control,
