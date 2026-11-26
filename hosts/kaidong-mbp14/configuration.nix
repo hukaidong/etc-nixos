@@ -2,18 +2,15 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{
-  config,
-  pkgs,
-  modulePath,
-  ...
-}:
+{ inputs, pkgs, ... }:
 
 {
   imports = [
+    inputs.nix-index-database.nixosModules.nix-index
     ./hardware-configuration.nix
     ./users.nix
     ./programs.nix
+    ../../profiles/nixos/workstation.nix
   ];
 
   networking.hostName = "Kaidong-MBP14";
@@ -31,5 +28,5 @@
 
   programs.nix-index-database.comma.enable = true;
 
-  kaidong-desktop.desktopEnvironment.plasma-i3.enable = true;
+  kaidong-desktop.desktopEnvironment.session = "plasma-i3";
 }
