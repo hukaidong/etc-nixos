@@ -17,7 +17,10 @@
     };
 
     sessionVariables = {
-      ZSH_CUSTOM = ../../../configs/omz-custom;
+      # Interpolated, so only this directory is copied to the store and the
+      # generation depends on it. A bare path points into the store copy of
+      # the whole flake, without depending on it (#11).
+      ZSH_CUSTOM = "${../../../configs/omz-custom}";
     };
 
     initContent = ''
