@@ -59,6 +59,18 @@ machine is a flake check of its own: `nix flake check --no-build
 --all-systems` evaluates all of them, and the dev shell's `update` command
 runs it before committing a new flake.lock.
 
+`nix fmt` runs deadnix, statix and nixfmt over every Nix file (treefmt.nix)
+and fixes what it can; the generated hardware-configuration.nix files are
+left alone. The `formatting` check fails when `nix fmt` would change a file
+or leaves a statix warning it cannot fix, such as a key repeated in one
+attribute set.
+
+GitHub Actions (.github/workflows/check.yml) runs `nix flake check --no-build
+--all-systems` and builds the formatting check on every push. The private
+inputs need two repository secrets, read tokens for each owner's repositories:
+HUKAIDONG_READ_TOKEN for hukaidong/flake-fonts, and KD_LAPWINGS_READ_TOKEN
+for kd-lapwings/lapwingqt and kd-lapwings/lapwingtools-rs.
+
 
 Extending
 ---------
@@ -74,3 +86,13 @@ When adding packages or services, prefer placing them in the appropriate
 thematic file rather than creating new files for small additions. The goal is
 maintainability through organization, not through proliferation of
 configuration files.
+
+A module opens with its options, so a reader sees what it does before how.
+Its top-level let holds only what the body needs to be read (cfg and a few
+names it uses throughout); other helpers sit in a let next to the code that
+uses them. Machinery large enough to push the options down, such as the Linux
+runner's image, goes in a directory named after the module
+(modules/darwin/services/github-runner-linux/ next to
+github-runner-linux.nix). Files there are not modules, so they are not
+imported. Name library functions with lib.<name> or inherit (lib) rather than
+a file-wide with, so every name's origin shows.

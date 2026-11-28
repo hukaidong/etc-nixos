@@ -17,7 +17,7 @@
         "--resilient"
         "-v"
       ];
-      StartCalendarInterval = [{ Minute = 5; }];
+      StartCalendarInterval = [ { Minute = 5; } ];
       UserName = config.home.username;
       StandardOutPath = "/tmp/rclone-bisync-org.log";
       StandardErrorPath = "/tmp/rclone-bisync-org.err";

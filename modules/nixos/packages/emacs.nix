@@ -8,22 +8,20 @@ let
   cfg = config.kaidong-desktop.programs.emacs;
 
   # Minimum set of packages for Emacs org mode, see https://wiki.nixos.org/wiki/TexLive
-  tex = (
-    pkgs.texlive.combine {
-      inherit (pkgs.texlive)
-        scheme-medium
-        dvisvgm
-        dvipng # for preview and export as html
-        wrapfig
-        amsmath
-        ulem
-        hyperref
-        capt-of
-        ;
-      #(setq org-latex-compiler "lualatex")
-      #(setq org-preview-latex-default-process 'dvisvgm)
-    }
-  );
+  tex = pkgs.texlive.combine {
+    inherit (pkgs.texlive)
+      scheme-medium
+      dvisvgm
+      dvipng # for preview and export as html
+      wrapfig
+      amsmath
+      ulem
+      hyperref
+      capt-of
+      ;
+    #(setq org-latex-compiler "lualatex")
+    #(setq org-preview-latex-default-process 'dvisvgm)
+  };
 
   emacsPackage = pkgs.emacs.pkgs.withPackages (epkgs: [ epkgs.mu4e ]);
 in
@@ -45,20 +43,19 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    environment.systemPackages =
+    environment.systemPackages = [
+      tex
+      emacsPackage
+      pkgs.libnotify
+    ]
+    ++ lib.optionals cfg.enableMailSupport (
+      with pkgs;
       [
-        tex
-        emacsPackage
-        pkgs.libnotify
+        davmail
+        isync
+        mu
       ]
-      ++ lib.optionals cfg.enableMailSupport (
-        with pkgs;
-        [
-          davmail
-          isync
-          mu
-        ]
-      );
+    );
 
     services.emacs = lib.mkIf cfg.enableService {
       enable = true;

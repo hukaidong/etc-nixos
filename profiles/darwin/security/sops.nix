@@ -1,4 +1,3 @@
-{ ... }:
 {
   # System-level secrets, decrypted by root into /run/secrets at activation and
   # again at boot by the sops-install-secrets launchd daemon. Same key location

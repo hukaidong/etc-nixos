@@ -8,117 +8,107 @@ in
 
   nodes = {
     # Test all virtualization components enabled
-    all-enabled =
-      { config, pkgs, ... }:
-      testHelpers.mkTestMachine {
-        extraModules = [ ../../modules/nixos/virtualization/virtualisation.nix ];
-        extraConfig = {
-          kaidong-desktop.virtualization = {
-            docker.enable = true;
-            podman.enable = true;
-            devcontainer.enable = true;
-            podmanCompose.enable = true;
-          };
+    all-enabled = testHelpers.mkTestMachine {
+      extraModules = [ ../../modules/nixos/virtualization/virtualisation.nix ];
+      extraConfig = {
+        kaidong-desktop.virtualization = {
+          docker.enable = true;
+          podman.enable = true;
+          devcontainer.enable = true;
+          podmanCompose.enable = true;
         };
       };
+    };
 
     # Test only Docker enabled
-    docker-only =
-      { config, pkgs, ... }:
-      testHelpers.mkTestMachine {
-        extraModules = [ ../../modules/nixos/virtualization/virtualisation.nix ];
-        extraConfig = {
-          kaidong-desktop.virtualization = {
-            docker.enable = true;
-            podman.enable = false;
-            devcontainer.enable = false;
-            podmanCompose.enable = false;
-          };
+    docker-only = testHelpers.mkTestMachine {
+      extraModules = [ ../../modules/nixos/virtualization/virtualisation.nix ];
+      extraConfig = {
+        kaidong-desktop.virtualization = {
+          docker.enable = true;
+          podman.enable = false;
+          devcontainer.enable = false;
+          podmanCompose.enable = false;
         };
       };
+    };
 
     # Test only Podman enabled
-    podman-only =
-      { config, pkgs, ... }:
-      testHelpers.mkTestMachine {
-        extraModules = [ ../../modules/nixos/virtualization/virtualisation.nix ];
-        extraConfig = {
-          kaidong-desktop.virtualization = {
-            docker.enable = false;
-            podman.enable = true;
-            devcontainer.enable = false;
-            podmanCompose.enable = false;
-          };
+    podman-only = testHelpers.mkTestMachine {
+      extraModules = [ ../../modules/nixos/virtualization/virtualisation.nix ];
+      extraConfig = {
+        kaidong-desktop.virtualization = {
+          docker.enable = false;
+          podman.enable = true;
+          devcontainer.enable = false;
+          podmanCompose.enable = false;
         };
       };
+    };
 
     # Test all disabled
-    all-disabled =
-      { config, pkgs, ... }:
-      testHelpers.mkTestMachine {
-        extraModules = [ ../../modules/nixos/virtualization/virtualisation.nix ];
-        extraConfig = {
-          kaidong-desktop.virtualization = {
-            docker.enable = false;
-            podman.enable = false;
-            devcontainer.enable = false;
-            podmanCompose.enable = false;
-          };
+    all-disabled = testHelpers.mkTestMachine {
+      extraModules = [ ../../modules/nixos/virtualization/virtualisation.nix ];
+      extraConfig = {
+        kaidong-desktop.virtualization = {
+          docker.enable = false;
+          podman.enable = false;
+          devcontainer.enable = false;
+          podmanCompose.enable = false;
         };
       };
+    };
   };
 
-  testScript =
-    { nodes, ... }:
-    ''
-      # Test all enabled
-      all_enabled = nodes["all-enabled"]
+  testScript = ''
+    # Test all enabled
+    all_enabled = nodes["all-enabled"]
 
-      # Check Docker
-      all_enabled.wait_for_unit("docker.service")
-      all_enabled.succeed("systemctl is-active docker")
-      all_enabled.succeed("command -v docker")
+    # Check Docker
+    all_enabled.wait_for_unit("docker.service")
+    all_enabled.succeed("systemctl is-active docker")
+    all_enabled.succeed("command -v docker")
 
-      # Check Podman
-      all_enabled.succeed("command -v podman")
+    # Check Podman
+    all_enabled.succeed("command -v podman")
 
-      # Check DevContainer
-      all_enabled.succeed("command -v devcontainer")
+    # Check DevContainer
+    all_enabled.succeed("command -v devcontainer")
 
-      # Check Podman Compose
-      all_enabled.succeed("command -v podman-compose")
+    # Check Podman Compose
+    all_enabled.succeed("command -v podman-compose")
 
-      # Test Docker only
-      docker_only = nodes["docker-only"]
+    # Test Docker only
+    docker_only = nodes["docker-only"]
 
-      docker_only.wait_for_unit("docker.service")
-      docker_only.succeed("systemctl is-active docker")
-      docker_only.succeed("command -v docker")
+    docker_only.wait_for_unit("docker.service")
+    docker_only.succeed("systemctl is-active docker")
+    docker_only.succeed("command -v docker")
 
-      # Verify other components are not installed
-      docker_only.fail("command -v podman")
-      docker_only.fail("command -v devcontainer")
-      docker_only.fail("command -v podman-compose")
+    # Verify other components are not installed
+    docker_only.fail("command -v podman")
+    docker_only.fail("command -v devcontainer")
+    docker_only.fail("command -v podman-compose")
 
-      # Test Podman only
-      podman_only = nodes["podman-only"]
+    # Test Podman only
+    podman_only = nodes["podman-only"]
 
-      podman_only.succeed("command -v podman")
+    podman_only.succeed("command -v podman")
 
-      # Verify other components are not installed
-      podman_only.fail("systemctl is-active docker")
-      podman_only.fail("command -v docker")
-      podman_only.fail("command -v devcontainer")
-      podman_only.fail("command -v podman-compose")
+    # Verify other components are not installed
+    podman_only.fail("systemctl is-active docker")
+    podman_only.fail("command -v docker")
+    podman_only.fail("command -v devcontainer")
+    podman_only.fail("command -v podman-compose")
 
-      # Test all disabled
-      all_disabled = nodes["all-disabled"]
+    # Test all disabled
+    all_disabled = nodes["all-disabled"]
 
-      # Verify no container runtimes are active
-      all_disabled.fail("systemctl is-active docker")
-      all_disabled.fail("command -v docker")
-      all_disabled.fail("command -v podman")
-      all_disabled.fail("command -v devcontainer")
-      all_disabled.fail("command -v podman-compose")
-    '';
+    # Verify no container runtimes are active
+    all_disabled.fail("systemctl is-active docker")
+    all_disabled.fail("command -v docker")
+    all_disabled.fail("command -v podman")
+    all_disabled.fail("command -v devcontainer")
+    all_disabled.fail("command -v podman-compose")
+  '';
 }

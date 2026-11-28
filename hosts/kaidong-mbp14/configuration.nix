@@ -17,12 +17,14 @@
 
   nixpkgs.config.allowUnfree = true;
 
-  boot.kernelPackages = pkgs.linuxPackages_latest;
-  boot.kernelParams = [
-    "mem_sleep_default=s2idle"
-    "no_console_suspend"
-  ];
-  boot.tmp.useTmpfs = false;
+  boot = {
+    kernelPackages = pkgs.linuxPackages_latest;
+    kernelParams = [
+      "mem_sleep_default=s2idle"
+      "no_console_suspend"
+    ];
+    tmp.useTmpfs = false;
+  };
 
   system.stateVersion = "25.11";
 

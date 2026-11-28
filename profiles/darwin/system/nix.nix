@@ -1,4 +1,3 @@
-{ ... }:
 {
   # nix-darwin manages the Nix daemon and /etc/nix/nix.conf (the GitHub runner
   # module requires it), replacing the official installer's copies. The
