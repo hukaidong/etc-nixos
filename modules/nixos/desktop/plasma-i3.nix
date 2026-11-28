@@ -13,45 +13,49 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    services.xserver = {
-      enable = true;
-      xkb = {
-        layout = "us";
-        variant = "dvp";
+    services = {
+      xserver = {
+        enable = true;
+        xkb = {
+          layout = "us";
+          variant = "dvp";
+        };
+
+        windowManager.i3 = {
+          enable = true;
+          extraPackages = with pkgs; [
+            dmenu
+            feh
+            i3status
+            picom
+          ];
+          configFile = ../../../configs/i3-plasma-config;
+        };
+        desktopManager.session = [
+          {
+            manage = "desktop";
+            name = "plasma-i3wm";
+            start = "KDEWM=${pkgs.i3}/bin/i3 /run/current-system/sw/bin/startplasma-x11";
+          }
+        ];
       };
 
-      windowManager.i3 = {
-        enable = true;
-        extraPackages = with pkgs; [
-          dmenu
-          feh
-          i3status
-          picom
-        ];
-        configFile = ../../../configs/i3-plasma-config;
-      };
-      desktopManager.session = [
-        {
-          manage = "desktop";
-          name = "plasma-i3wm";
-          start = "KDEWM=${pkgs.i3}/bin/i3 /run/current-system/sw/bin/startplasma-x11";
-        }
-      ];
+      desktopManager.plasma6.enable = true;
+
+      # Troubleshooting flickering issues with nvidia drivers
+      # See https://nixos.wiki/wiki/Nvidia#Fix_app_flickering_with_Picom
+      picom.enable = true;
+
+      displayManager.sddm.enable = true;
+      displayManager.defaultSession = "plasma-i3wm+i3";
+
+      # Stands in for KWin, disabled below. Every NixOS host imports fakwin's
+      # module (hosts/nixos.nix).
+      fakwin.enable = true;
     };
 
-    services.desktopManager.plasma6.enable = true;
-
-    # Troubleshooting flickering issues with nvidia drivers
-    # See https://nixos.wiki/wiki/Nvidia#Fix_app_flickering_with_Picom
-    services.picom.enable = true;
-
-    services.displayManager.sddm.enable = true;
-    services.displayManager.defaultSession = "plasma-i3wm+i3";
-
     # Disable the real KWin; fakwin answers its D-Bus calls instead, so
-    # Plasma's logout, reboot and shutdown keep working. Every NixOS host
-    # imports fakwin's module (hosts/nixos.nix).
+    # Plasma's logout, reboot and shutdown keep working.
     systemd.user.services.plasma-kwin_x11.enable = false;
-    services.fakwin.enable = true;
   };
 }

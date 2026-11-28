@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+_:
 # Copyright (c) 2016-present Sven Greb <development@svengreb.de>
 # This source code is licensed under the MIT license found in the license file.
 
@@ -7,7 +7,7 @@
     enable = true;
     enableBashIntegration = true;
     enableZshIntegration = true;
-    
+
     settings = {
       # Global Defaults
       NORMAL = "00";
@@ -16,26 +16,26 @@
       DIR = "01;34";
       LINK = "36";
       MULTIHARDLINK = "04;36";
-      
+
       FIFO = "04;01;36";
       SOCK = "04;33";
       DOOR = "04;01;36";
       BLK = "01;33";
       CHR = "33";
-      
+
       ORPHAN = "31";
       MISSING = "01;37;41";
-      
+
       EXEC = "01;36";
-      
+
       SETUID = "01;04;37";
       SETGID = "01;04;37";
       CAPABILITY = "01;37";
-      
+
       STICKY_OTHER_WRITABLE = "01;37;44";
       OTHER_WRITABLE = "01;04;34";
       STICKY = "04;37;44";
-      
+
       # Extension Pattern - Archives
       ".7z" = "01;32";
       ".ace" = "01;32";
@@ -80,7 +80,7 @@
       ".zip" = "01;32";
       ".zoo" = "01;32";
       ".zst" = "01;32";
-      
+
       # Audio
       ".aac" = "32";
       ".au" = "32";
@@ -97,13 +97,13 @@
       ".opus" = "32";
       ".ra" = "32";
       ".wav" = "32";
-      
+
       # Customs (encryption)
       ".3des" = "01;35";
       ".aes" = "01;35";
       ".gpg" = "01;35";
       ".pgp" = "01;35";
-      
+
       # Documents
       ".doc" = "32";
       ".docx" = "32";
@@ -121,7 +121,7 @@
       ".pptx" = "32";
       ".xls" = "32";
       ".xlsx" = "32";
-      
+
       # Executables
       ".app" = "01;36";
       ".bat" = "01;36";
@@ -130,7 +130,7 @@
       ".com" = "01;36";
       ".exe" = "01;36";
       ".reg" = "01;36";
-      
+
       # Ignores (backup/temp files)
       "*~" = "02;37";
       ".bak" = "02;37";
@@ -142,7 +142,7 @@
       ".ORIG" = "02;37";
       ".swo" = "02;37";
       ".swp" = "02;37";
-      
+
       # Images
       ".bmp" = "32";
       ".cgm" = "32";
@@ -174,7 +174,7 @@
       ".xpm" = "32";
       ".xwd" = "32";
       ".yuv" = "32";
-      
+
       # Video
       ".anx" = "32";
       ".asf" = "32";

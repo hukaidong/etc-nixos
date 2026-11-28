@@ -17,7 +17,7 @@ in
   # Plover and its plugins, e.g. pkgs.plover-flake.plover.withPlugins
   plover-flake = inputs.plover-flake.packages.${system};
 
-  ruby-custom = (inputs.nixpkgs-ruby.packages.${system}."ruby-4.0.0").override {
+  ruby-custom = inputs.nixpkgs-ruby.packages.${system}."ruby-4.0.0".override {
     docSupport = true;
   };
   myfonts = inputs.fontconfig.packages.${system}.default;

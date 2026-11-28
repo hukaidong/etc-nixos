@@ -5,5 +5,5 @@
     defaultSopsFile = ../../../secrets/secrets.yaml;
   };
 
-  sops.secrets."nix-access-tokens" = {};
+  sops.secrets."nix-access-tokens" = { };
 }

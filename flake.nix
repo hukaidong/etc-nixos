@@ -12,6 +12,7 @@
     nix-index-database.url = "github:nix-community/nix-index-database";
     plover-flake.url = "github:openstenoproject/plover-flake";
     sops-nix.url = "github:Mic92/sops-nix";
+    treefmt-nix.url = "github:numtide/treefmt-nix";
     fontconfig.url = "github:hukaidong/flake-fonts";
     lapwingqt.url = "github:kd-lapwings/lapwingqt";
 
@@ -20,6 +21,7 @@
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
     fakwin.inputs.nixpkgs.follows = "nixpkgs";
     fontconfig.inputs.nixpkgs.follows = "nixpkgs";
+    treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   # Each output is built in the file named here; see the README for the layout.
@@ -31,5 +33,6 @@
     overlays.default = import ./overlays inputs;
     checks = import ./tests inputs;
     devShells = import ./shell.nix inputs;
+    formatter = import ./formatter.nix inputs;
   };
 }

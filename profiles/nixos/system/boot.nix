@@ -1,9 +1,14 @@
 { lib, ... }:
 {
-  boot.loader.systemd-boot.enable = true;
-  boot.loader.systemd-boot.configurationLimit = 20;
-  boot.loader.efi.canTouchEfiVariables = true;
+  boot = {
+    loader = {
+      systemd-boot = {
+        enable = true;
+        configurationLimit = 20;
+      };
+      efi.canTouchEfiVariables = true;
+    };
 
-  boot.tmp.useTmpfs = lib.mkDefault true;
+    tmp.useTmpfs = lib.mkDefault true;
+  };
 }
-

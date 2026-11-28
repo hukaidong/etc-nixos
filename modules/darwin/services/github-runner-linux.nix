@@ -125,20 +125,22 @@ in
           }
         ];
 
-      users.users.${user} = {
-        uid = lib.mkDefault 540;
-        gid = config.users.groups.${group}.gid;
-        home = stateDir;
-        createHome = false;
-        shell = "/bin/bash";
-        description = "GitHub Actions runner (Linux VM)";
+      users = {
+        users.${user} = {
+          uid = lib.mkDefault 540;
+          gid = config.users.groups.${group}.gid;
+          home = stateDir;
+          createHome = false;
+          shell = "/bin/bash";
+          description = "GitHub Actions runner (Linux VM)";
+        };
+        groups.${group} = {
+          gid = lib.mkDefault 540;
+          description = "GitHub Actions runner (Linux VM)";
+        };
+        knownUsers = [ user ];
+        knownGroups = [ group ];
       };
-      users.groups.${group} = {
-        gid = lib.mkDefault 540;
-        description = "GitHub Actions runner (Linux VM)";
-      };
-      users.knownUsers = [ user ];
-      users.knownGroups = [ group ];
 
       sops.secrets."github-runner-token-linux" = {
         key = cfg.tokenSecret;

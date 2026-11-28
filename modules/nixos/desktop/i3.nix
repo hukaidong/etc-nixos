@@ -14,9 +14,20 @@ in
 
   config = lib.mkMerge [
     (lib.mkIf cfg.enable {
-      environment.systemPackages = with pkgs; [
-        kdePackages.kwallet
-      ];
+      environment = {
+        systemPackages = with pkgs; [
+          kdePackages.kwallet
+        ];
+
+        etc."i3/workspace-layout.sh" = {
+          source = ../../../configs/i3-workspace-layout.sh;
+          mode = "0755";
+        };
+
+        etc."i3/wallpapers" = {
+          source = ../../../configs/wallpapers;
+        };
+      };
 
       services.xserver = {
         enable = true;
@@ -38,15 +49,6 @@ in
           ];
           configFile = ../../../configs/i3-config;
         };
-      };
-
-      environment.etc."i3/workspace-layout.sh" = {
-        source = ../../../configs/i3-workspace-layout.sh;
-        mode = "0755";
-      };
-
-      environment.etc."i3/wallpapers" = {
-        source = ../../../configs/wallpapers;
       };
 
       services = {

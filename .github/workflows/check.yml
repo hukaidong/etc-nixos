@@ -1,0 +1,34 @@
+# Evaluates every flake check (each machine's system, the Mac's included, and
+# the VM tests) on every push, and builds the formatting check, which is cheap.
+# Building the machines and booting the VM tests is left to `nix flake check`
+# on a machine. The Mac Studio's self-hosted runners belong to kd-lapwings and
+# cannot serve this repository, so this runs on GitHub's hosted runners.
+name: check
+
+on:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  flake-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      # Public inputs are fetched with the workflow's own token, which only
+      # raises GitHub's rate limit. The private ones need a read token from
+      # each owner, as Nix picks a token by the longest matching prefix:
+      #   HUKAIDONG_READ_TOKEN    hukaidong/flake-fonts
+      #   KD_LAPWINGS_READ_TOKEN  kd-lapwings/lapwingqt, kd-lapwings/lapwingtools-rs
+      # Each can be a fine-grained personal access token owned by that account
+      # with read-only Contents access to those repositories.
+      - uses: cachix/install-nix-action@v32
+        with:
+          extra_nix_config: |
+            extra-access-tokens = github.com/hukaidong=${{ secrets.HUKAIDONG_READ_TOKEN }} github.com/kd-lapwings=${{ secrets.KD_LAPWINGS_READ_TOKEN }}
+      - name: Evaluate every check
+        run: nix flake check --no-build --all-systems
+      - name: Check formatting and lints
+        run: nix build --print-build-logs .#checks.x86_64-linux.formatting

@@ -1,4 +1,3 @@
-{ ... }:
 {
   sops = {
     age.keyFile = "/etc/sops/age/key.txt";

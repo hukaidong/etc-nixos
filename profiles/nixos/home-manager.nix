@@ -4,19 +4,21 @@
 {
   _class = "nixos";
 
-  home-manager.useGlobalPkgs = true;
-  home-manager.useUserPackages = true;
+  home-manager = {
+    useGlobalPkgs = true;
+    useUserPackages = true;
 
-  home-manager.backupFileExtension = "pre-homemanager";
+    backupFileExtension = "pre-homemanager";
 
-  home-manager.sharedModules = [
-    inputs.plover-flake.homeManagerModules.plover
-    inputs.sops-nix.homeManagerModules.sops
-  ];
+    sharedModules = [
+      inputs.plover-flake.homeManagerModules.plover
+      inputs.sops-nix.homeManagerModules.sops
+    ];
 
-  home-manager.users.kaidong.imports = [
-    ../home/base.nix
-    ../../modules/home
-    ../home/desktop.nix
-  ];
+    users.kaidong.imports = [
+      ../home/base.nix
+      ../../modules/home
+      ../home/desktop.nix
+    ];
+  };
 }

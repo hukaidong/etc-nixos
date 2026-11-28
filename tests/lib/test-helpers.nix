@@ -2,9 +2,6 @@
 
 { lib, pkgs, ... }:
 
-let
-  inherit (lib) mkOption types;
-in
 {
   # Helper to create a minimal test machine configuration
   mkTestMachine =
@@ -39,34 +36,37 @@ in
       specialArgs = { inherit pkgs lib; };
     };
 
+  # The helpers below return test-script lines that check `machine`, the
+  # Python name of a machine in the test script (e.g. "enabled").
+
   # Helper to check if service is enabled
   assertServiceEnabled = serviceName: machine: ''
-    machine.wait_for_unit("${serviceName}")
-    machine.succeed("systemctl is-active ${serviceName}")
+    ${machine}.wait_for_unit("${serviceName}")
+    ${machine}.succeed("systemctl is-active ${serviceName}")
   '';
 
   # Helper to check if service is disabled
   assertServiceDisabled = serviceName: machine: ''
-    machine.fail("systemctl is-active ${serviceName}")
+    ${machine}.fail("systemctl is-active ${serviceName}")
   '';
 
   # Helper to check package installation
   assertPackageInstalled = packageName: machine: ''
-    machine.succeed("command -v ${packageName}")
+    ${machine}.succeed("command -v ${packageName}")
   '';
 
   # Helper to check package not installed
   assertPackageNotInstalled = packageName: machine: ''
-    machine.fail("command -v ${packageName}")
+    ${machine}.fail("command -v ${packageName}")
   '';
 
   # Helper to check firewall rules
   assertFirewallPort = port: protocol: machine: ''
-    machine.succeed("iptables -L INPUT | grep -E '${protocol}\\s+${port}'")
+    ${machine}.succeed("iptables -L INPUT | grep -E '${protocol}\\s+${port}'")
   '';
 
   # Helper to check user group membership
   assertUserInGroup = user: group: machine: ''
-    machine.succeed("groups ${user} | grep ${group}")
+    ${machine}.succeed("groups ${user} | grep ${group}")
   '';
 }

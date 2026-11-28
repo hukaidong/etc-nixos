@@ -13,7 +13,9 @@
     ./darwin/ruby.nix
   ];
 
-  home.username = "kaidong";
-  home.homeDirectory = "/Users/${config.home.username}";
-  home.packages = [ pkgs.home-manager ];
+  home = {
+    username = "kaidong";
+    homeDirectory = "/Users/${config.home.username}";
+    packages = [ pkgs.home-manager ];
+  };
 }
