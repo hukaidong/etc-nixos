@@ -23,16 +23,27 @@ credentials remain secure even in version control.
 Structure
 ---------
 
-The repository organizes code by purpose rather than by machine. The hosts
-directory contains hardware-specific configurations and the minimal glue
-needed to assemble a complete system. The modules directory holds reusable
-components that can be enabled or disabled per host. The home directory
-manages user environment configuration through home-manager.
+The repository organizes code by purpose rather than by machine, in layers
+that each depend only on the ones above them:
+
+    overlays/   packages added to nixpkgs (pkgs.unstable, pkgs.ai-tools, ...)
+    modules/    option modules, one directory per kind of configuration
+                (nixos, darwin, home). Every host gets all of its kind's
+                modules, and a module changes nothing until a host enables it.
+    profiles/   settings that apply as soon as they are imported, again per
+                kind. A host names the profiles it uses, e.g.
+                profiles/nixos/workstation.nix.
+    hosts/      one directory per machine (hardware, settings, its profiles),
+                plus nixos.nix, darwin.nix and home.nix, which list the
+                machines and the modules every machine of that kind gets.
+
+flake.nix only maps each output to the file that builds it. Every module and
+profile entry point declares its kind with `_class`, so importing a NixOS file
+into a darwin or Home Manager configuration fails with a clear error.
 
 This design means adding a new machine requires only a small host-specific
-configuration that imports the relevant shared modules. Common patterns and
-packages are defined once and inherited everywhere.
-
+configuration that imports the relevant profiles and enables modules. Common
+patterns and packages are defined once and inherited everywhere.
 
 Workflow
 --------
@@ -43,17 +54,23 @@ to rapidly-evolving packages without compromising system stability.
 
 System rebuilds pull from the locked inputs, and the configuration tracks
 its own git revision for auditability. Integration tests verify that core
-services start correctly before changes reach production machines.
+services start correctly before changes reach production machines, and every
+machine is a flake check of its own: `nix flake check --no-build
+--all-systems` evaluates all of them, and the dev shell's `update` command
+runs it before committing a new flake.lock.
 
 
 Extending
 ---------
 
-New modules should follow the existing pattern of defining options under a
-consistent namespace and using conditional configuration. This allows
-features to be toggled per-host without code duplication.
+Decide first whether new configuration is an option or an opinion. A
+feature a host may or may not want is a module under modules/<kind>: it
+defines options under a consistent namespace and puts all of its
+configuration behind them, so every host can import it without effect.
+Settings every machine of a kind should simply have go in a profile under
+profiles/<kind>, and the hosts that want them import that profile.
 
 When adding packages or services, prefer placing them in the appropriate
-thematic module rather than creating new files for small additions. The
-goal is maintainability through organization, not through proliferation
-of configuration files.
+thematic file rather than creating new files for small additions. The goal is
+maintainability through organization, not through proliferation of
+configuration files.

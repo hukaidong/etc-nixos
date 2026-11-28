@@ -2,8 +2,8 @@
 
 The Mac Studio runs the kd-lapwings organization's two self-hosted runners.
 `darwinConfigurations.Kaidong-Mac-Studio` sets them up:
-`darwin/services/github-runners.nix` (shared options and the macOS runner),
-`darwin/services/github-runner-linux.nix` with the scripts in
+`modules/darwin/services/github-runners.nix` (shared options and the macOS runner),
+`modules/darwin/services/github-runner-linux.nix` with the scripts in
 `configs/github-runner-linux/`, and the settings in
 `hosts/kaidong-mac-studio/configuration.nix`. Pull requests #3 and #5 explain
 the design and the one-time setup. This page covers checking on the runners

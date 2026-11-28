@@ -14,7 +14,9 @@ in
       ...
     }:
     {
-      imports = extraModules;
+      # extraConfig is a module of its own rather than `// extraConfig`, which
+      # would replace whole top-level attributes such as `users`.
+      imports = extraModules ++ [ extraConfig ];
 
       # Minimal base configuration for testing
       users.users.kaidong = {
@@ -22,10 +24,7 @@ in
         description = "Test User";
         group = "users";
       };
-
-      # Add any extra configuration
-    }
-    // extraConfig;
+    };
 
   # Helper to test module options evaluation
   evalModule =

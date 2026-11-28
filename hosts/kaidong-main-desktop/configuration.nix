@@ -2,12 +2,7 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{
-  config,
-  pkgs,
-  desktopEnvironment ? "i3",
-  ...
-}:
+{ lib, pkgs, ... }:
 {
   nixpkgs.config.allowUnfree = true;
 
@@ -17,6 +12,7 @@
     ./users.nix
     ./programs.nix
     ./virtualization.nix
+    ../../profiles/nixos/workstation.nix
   ];
 
   networking.hostName = "Kaidong-Main-Desktop";
@@ -26,9 +22,9 @@
   programs.steam.enable = true;
   programs.steam.protontricks.enable = true;
 
-  kaidong-desktop.desktopEnvironment.i3.enable = desktopEnvironment == "i3";
-  kaidong-desktop.desktopEnvironment.plasma-i3.enable = desktopEnvironment == "plasma-i3";
-  kaidong-desktop.desktopEnvironment.plasma6.enable = desktopEnvironment == "plasma6";
+  # i3 by default; hosts/nixos.nix also builds this machine with Plasma 6
+  # (Kaidong-Main-Desktop-Plasma) by overriding this.
+  kaidong-desktop.desktopEnvironment.session = lib.mkDefault "i3";
 
   # Autorandr profile for this host's monitor (Samsung C49RG9x ultrawide)
   services.autorandr.profiles.home = {

@@ -1,7 +1,8 @@
-{ ... }:
 {
   # System layer only (nix-darwin). User-level config is the standalone
   # home-manager configuration homeConfigurations.Kaidong-Mac-Studio.
+  imports = [ ../../profiles/darwin/base.nix ];
+
   nixpkgs.hostPlatform = "aarch64-darwin";
 
   # nix-darwin release whose stateful defaults this machine was set up with

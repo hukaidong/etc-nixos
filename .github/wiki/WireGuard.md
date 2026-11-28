@@ -7,7 +7,7 @@ Two modules set it up, one per repository:
 | | Hub: the droplet | Spoke: the Mac Studio |
 |---|---|---|
 | Repository | `nixos-lab` | `etc-nixos` |
-| Module | `modules/networking/wireguard.nix` (`nixlab.networking.wireguard`) | `darwin/networking/wireguard.nix` (`kaidong-desktop.networking.wireguard`) |
+| Module | `modules/networking/wireguard.nix` (`nixlab.networking.wireguard`) | `modules/darwin/networking/wireguard.nix` (`kaidong-desktop.networking.wireguard`) |
 | Settings | `hosts/digitalocean/default.nix` | `hosts/kaidong-mac-studio/configuration.nix` |
 | Address | `10.77.0.1` (`digix.wg.internal`) | `10.77.0.2` (`mac-studio.wg.internal`) |
 | Interface | `wg0`, listening on UDP 51820 | `wg0` (really `utunN`; see `/var/run/wireguard/wg0.name`) |
