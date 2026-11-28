@@ -198,11 +198,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1795498653,
-        "narHash": "sha256-B+LxKwhziisG9HoRqetrbiyY6OmSbq0fYxqnvxso2j4=",
+        "lastModified": 1795838723,
+        "narHash": "sha256-pwtfnR0PQUYNg4A6CvFjSekVLPCV9G7KfN0WxcIuEnY=",
         "owner": "kd-lapwings",
         "repo": "lapwingqt",
-        "rev": "4dbbf754804cb1933ac36dd8b0f45bd661928e8e",
+        "rev": "d700f9a2ce7b817c14180cc7014889b3c191b52d",
         "type": "github"
       },
       "original": {
@@ -216,11 +216,11 @@
         "nixpkgs": "nixpkgs"
       },
       "locked": {
-        "lastModified": 1795379124,
-        "narHash": "sha256-P0T7f6T2Ol1KbnCxYkgnY//I8DZj941jKmyROi1fbyk=",
+        "lastModified": 1795590282,
+        "narHash": "sha256-TospBSY28WEsYsgeq5fc9OcN9chqfm0+ixnO/K1D6gg=",
         "owner": "kd-lapwings",
         "repo": "lapwingtools-rs",
-        "rev": "49d329654df347bce2e756cd3d4a3641efb6b3c8",
+        "rev": "3bb35baac170dbcb50d47f7bb66a3f44ac6eb3f7",
         "type": "github"
       },
       "original": {
