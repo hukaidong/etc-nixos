@@ -74,3 +74,13 @@ When adding packages or services, prefer placing them in the appropriate
 thematic file rather than creating new files for small additions. The goal is
 maintainability through organization, not through proliferation of
 configuration files.
+
+A module opens with its options, so a reader sees what it does before how.
+Its top-level let holds only what the body needs to be read (cfg and a few
+names it uses throughout); other helpers sit in a let next to the code that
+uses them. Machinery large enough to push the options down, such as the Linux
+runner's image, goes in a directory named after the module
+(modules/darwin/services/github-runner-linux/ next to
+github-runner-linux.nix). Files there are not modules, so they are not
+imported. Name library functions with lib.<name> or inherit (lib) rather than
+a file-wide with, so every name's origin shows.

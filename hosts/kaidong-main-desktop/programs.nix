@@ -1,5 +1,4 @@
 { pkgs, ... }:
-with pkgs;
 {
   kaidong-desktop.programs.emacs = {
     enable = true;
@@ -14,7 +13,7 @@ with pkgs;
   };
 
   services.ollama.enable = true;
-  services.ollama.package = unstable.ollama-rocm;
+  services.ollama.package = pkgs.unstable.ollama-rocm;
 
   nixpkgs.config.rocmSupport = true;
 }

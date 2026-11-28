@@ -4,10 +4,9 @@
   lib,
   ...
 }:
-
-with lib;
-
 let
+  inherit (lib) mkEnableOption mkIf;
+
   cfg = config.kaidong-desktop.virtualization.virtManager;
 in
 {
